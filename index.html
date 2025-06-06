@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscador Avanzado de Colegios de Canarias</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" xintegrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8;
+        }
+        .word-break-all { word-break: break-all; }
+        /* Transiciones suaves para el acordeón */
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+        }
+        .accordion-content.open {
+            max-height: 3000px; /* Un valor grande para asegurar que todo el contenido quepa */
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <!-- React y Babel -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script type="text/babel">
+        // --- Componente principal de la aplicación React ---
+        const App = () => {
+            // --- DATOS COMPLETOS ---
+            const baseMunicipalitiesData = [
+                // Tenerife
+                { island: "Tenerife", municipality: "San Cristóbal de La Laguna", zone: "Norte", airport: "TFN", distance: 4.08 },
+                { island: "Tenerife", municipality: "Santa Cruz de Tenerife", zone: "Norte", airport: "TFN", distance: 9.76 },
+                { island: "Tenerife", municipality: "El Rosario", zone: "Norte", airport: "TFN", distance: 10.34 },
+                { island: "Tenerife", municipality: "Tegueste", zone: "Norte", airport: "TFN", distance: 9.90 },
+                { island: "Tenerife", municipality: "Tacoronte", zone: "Norte", airport: "TFN", distance: 13.78 },
+                { island: "Tenerife", municipality: "El Sauzal", zone: "Norte", airport: "TFN", distance: 11.23 },
+                { island: "Tenerife", municipality: "La Matanza de Acentejo", zone: "Norte", airport: "TFN", distance: 12.45 },
+                { island: "Tenerife", municipality: "La Victoria de Acentejo", zone: "Norte", airport: "TFN", distance: 15.01 },
+                { island: "Tenerife", municipality: "Santa Úrsula", zone: "Norte", airport: "TFN", distance: 17.56 },
+                { island: "Tenerife", municipality: "La Orotava", zone: "Norte", airport: "TFN", distance: 20.12 },
+                { island: "Tenerife", municipality: "Puerto de la Cruz", zone: "Norte", airport: "TFN", distance: 22.67 },
+                { island: "Tenerife", municipality: "Los Realejos", zone: "Norte", airport: "TFN", distance: 25.23 },
+                { island: "Tenerife", municipality: "San Juan de la Rambla", zone: "Norte", airport: "TFN", distance: 27.78 },
+                { island: "Tenerife", municipality: "La Guancha", zone: "Norte", airport: "TFN", distance: 29.34 },
+                { island: "Tenerife", municipality: "Icod de los Vinos", zone: "Norte", airport: "TFN", distance: 32.89 },
+                { island: "Tenerife", municipality: "Garachico", zone: "Norte", airport: "TFN", distance: 36.45 },
+                { island: "Tenerife", municipality: "El Tanque", zone: "Norte", airport: "TFN", distance: 39.12 },
+                { island: "Tenerife", municipality: "Los Silos", zone: "Norte", airport: "TFN", distance: 42.67 },
+                { island: "Tenerife", municipality: "Buenavista del Norte", zone: "Norte", airport: "TFN", distance: 46.32 },
+                { island: "Tenerife", municipality: "Candelaria", zone: "Este", airport: "TFN", distance: 16.89 },
+                { island: "Tenerife", municipality: "Arafo", zone: "Este", airport: "TFS", distance: 19.45 },
+                { island: "Tenerife", municipality: "Güímar", zone: "Este", airport: "TFS", distance: 22.01 },
+                { island: "Tenerife", municipality: "Fasnia", zone: "Este", airport: "TFS", distance: 25.56 },
+                { island: "Tenerife", municipality: "Arico", zone: "Este", airport: "TFS", distance: 29.12 },
+                { island: "Tenerife", municipality: "San Miguel de Abona", zone: "Sur", airport: "TFS", distance: 4.79 },
+                { island: "Tenerife", municipality: "Granadilla de Abona", zone: "Sur", airport: "TFS", distance: 7.34 },
+                { island: "Tenerife", municipality: "Arona", zone: "Sur", airport: "TFS", distance: 4.24 },
+                { island: "Tenerife", municipality: "Vilaflor de Chasna", zone: "Oeste", airport: "TFS", distance: 13.34 },
+                { island: "Tenerife", municipality: "Adeje", zone: "Oeste", airport: "TFS", distance: 6.04 },
+                { island: "Tenerife", municipality: "Guía de Isora", zone: "Oeste", airport: "TFS", distance: 12.67 },
+                { island: "Tenerife", municipality: "Santiago del Teide", zone: "Oeste", airport: "TFS", distance: 22.89 },
+                // Gran Canaria
+                { island: "Gran Canaria", municipality: "Ingenio", zone: "Este", airport: "LPA", distance: 5.45 },
+                { island: "Gran Canaria", municipality: "Telde", zone: "Este", airport: "LPA", distance: 6.62 },
+                { island: "Gran Canaria", municipality: "Agüimes", zone: "Este", airport: "LPA", distance: 7.89 },
+                { island: "Gran Canaria", municipality: "Valsequillo de Gran Canaria", zone: "Este", airport: "LPA", distance: 9.12 },
+                { island: "Gran Canaria", municipality: "Las Palmas de Gran Canaria", zone: "Norte", airport: "LPA", distance: 21.65 },
+                { island: "Gran Canaria", municipality: "Arucas", zone: "Norte", airport: "LPA", distance: 16.45 },
+                { island: "Gran Canaria", municipality: "Santa Brígida", zone: "Norte", airport: "LPA", distance: 12.34 },
+                { island: "Gran Canaria", municipality: "Vega de San Mateo", zone: "Norte", airport: "LPA", distance: 14.78 },
+                { island: "Gran Canaria", municipality: "Teror", zone: "Norte", airport: "LPA", distance: 16.01 },
+                { island: "Gran Canaria", municipality: "Firgas", zone: "Norte", airport: "LPA", distance: 18.67 },
+                { island: "Gran Canaria", municipality: "Valleseco", zone: "Norte", airport: "LPA", distance: 19.23 },
+                { island: "Gran Canaria", municipality: "Moya", zone: "Norte", airport: "LPA", distance: 20.89 },
+                { island: "Gran Canaria", municipality: "Santa María de Guía de Gran Canaria", zone: "Norte", airport: "LPA", distance: 24.12 },
+                { island: "Gran Canaria", municipality: "Gáldar", zone: "Norte", airport: "LPA", distance: 28.34 },
+                { island: "Gran Canaria", municipality: "Agaete", zone: "Norte", airport: "LPA", distance: 31.45 },
+                { island: "Gran Canaria", municipality: "Santa Lucía de Tirajana", zone: "Sur", airport: "LPA", distance: 12.34 },
+                { island: "Gran Canaria", municipality: "San Bartolomé de Tirajana", zone: "Sur", airport: "LPA", distance: 17.56 },
+                { island: "Gran Canaria", municipality: "Mogán", zone: "Oeste", airport: "LPA", distance: 31.23 },
+                { island: "Gran Canaria", municipality: "Tejeda", zone: "Oeste", airport: "LPA", distance: 20.01 },
+                { island: "Gran Canaria", municipality: "Artenara", zone: "Oeste", airport: "LPA", distance: 25.67 },
+                { island: "Gran Canaria", municipality: "La Aldea de San Nicolás", zone: "Oeste", airport: "LPA", distance: 39.45 },
+                // Lanzarote
+                { island: "Lanzarote", municipality: "Arrecife", zone: "Este", airport: "ACE", distance: 5.15 },
+                { island: "Lanzarote", municipality: "San Bartolomé", zone: "Este", airport: "ACE", distance: 7.34 },
+                { island: "Lanzarote", municipality: "Tías", zone: "Sur", airport: "ACE", distance: 5.62 },
+                { island: "Lanzarote", municipality: "Teguise", zone: "Norte", airport: "ACE", distance: 10.12 },
+                { island: "Lanzarote", municipality: "Tinajo", zone: "Oeste", airport: "ACE", distance: 13.45 },
+                { island: "Lanzarote", municipality: "Yaiza", zone: "Sur", airport: "ACE", distance: 15.23 },
+                { island: "Lanzarote", municipality: "Haría", zone: "Norte", airport: "ACE", distance: 25.67 },
+                // Fuerteventura
+                { island: "Fuerteventura", municipality: "Puerto del Rosario", zone: "Este", airport: "FUE", distance: 5.38 },
+                { island: "Fuerteventura", municipality: "Antigua", zone: "Este", airport: "FUE", distance: 13.67 },
+                { island: "Fuerteventura", municipality: "Betancuria", zone: "Oeste", airport: "FUE", distance: 20.89 },
+                { island: "Fuerteventura", municipality: "La Oliva", zone: "Norte", airport: "FUE", distance: 22.45 },
+                { island: "Fuerteventura", municipality: "Pájara", zone: "Sur", airport: "FUE", distance: 35.12 },
+                { island: "Fuerteventura", municipality: "Tuineje", zone: "Sur", airport: "FUE", distance: 37.65 },
+                // La Palma
+                { island: "La Palma", municipality: "Breña Baja", zone: "Este", airport: "SPC", distance: 3.45 },
+                { island: "La Palma", municipality: "Villa de Mazo", zone: "Este", airport: "SPC", distance: 5.67 },
+                { island: "La Palma", municipality: "Breña Alta", zone: "Este", airport: "SPC", distance: 4.79 },
+                { island: "La Palma", municipality: "Santa Cruz de La Palma", zone: "Este", airport: "SPC", distance: 6.44 },
+                { island: "La Palma", municipality: "Puntallana", zone: "Este", airport: "SPC", distance: 8.90 },
+                { island: "La Palma", municipality: "San Andrés y Sauces", zone: "Este", airport: "SPC", distance: 17.01 },
+                { island: "La Palma", municipality: "Barlovento", zone: "Norte", airport: "SPC", distance: 20.23 },
+                { island: "La Palma", municipality: "Fuencaliente de La Palma", zone: "Sur", airport: "SPC", distance: 22.01 },
+                { island: "La Palma", municipality: "El Paso", zone: "Oeste", airport: "SPC", distance: 12.34 },
+                { island: "La Palma", municipality: "Los Llanos de Aridane", zone: "Oeste", airport: "SPC", distance: 16.89 },
+                { island: "La Palma", municipality: "Tazacorte", zone: "Oeste", airport: "SPC", distance: 18.67 },
+                { island: "La Palma", municipality: "Tijarafe", zone: "Oeste", airport: "SPC", distance: 22.45 },
+                { island: "La Palma", municipality: "Puntagorda", zone: "Oeste", airport: "SPC", distance: 25.67 },
+                { island: "La Palma", municipality: "Garafía", zone: "Norte", airport: "SPC", distance: 30.00 },
+                // La Gomera
+                { island: "La Gomera", municipality: "Alajeró", zone: "Sur", airport: "GMZ", distance: 4.26 },
+                { island: "La Gomera", municipality: "Valle Gran Rey", zone: "Oeste", airport: "GMZ", distance: 12.34 },
+                { island: "La Gomera", municipality: "Hermigua", zone: "Norte", airport: "GMZ", distance: 19.01 },
+                { island: "La Gomera", municipality: "Agulo", zone: "Norte", airport: "GMZ", distance: 22.23 },
+                { island: "La Gomera", municipality: "Vallehermoso", zone: "Norte", airport: "GMZ", distance: 25.45 },
+                { island: "La Gomera", municipality: "San Sebastián de La Gomera", zone: "Este", airport: "GMZ", distance: 31.07 },
+                // El Hierro
+                { island: "El Hierro", municipality: "Valverde", zone: "Este", airport: "VDE", distance: 8.80 },
+                { island: "El Hierro", municipality: "Frontera", zone: "Oeste", airport: "VDE", distance: 10.65 },
+                { island: "El Hierro", municipality: "El Pinar de El Hierro", zone: "Sur", airport: "VDE", distance: 17.34 },
+            ];
+
+            const allSchoolsData = [
+// GRAN CANARIA
+             { Codigo: '35000045', Denominacion: 'CEIP ANA BETANCOR ESTUPIÑÁN', Municipio: 'AGAETE', Direccion: 'CAMINO LOS ROMEROS, 54', Telefono: '928-306366', CorreoElectronico: '35000045@gobiernodecanarias.org' },
+                { Codigo: '35000033', Denominacion: 'CEIP EL RISCO', Municipio: 'AGAETE', Direccion: 'EL RISCO, S/N', Telefono: '928-455783', CorreoElectronico: '35000033@gobiernodecanarias.org' },
+                { Codigo: '35000011', Denominacion: 'CEIP JOSÉ SÁNCHEZ Y SÁNCHEZ', Municipio: 'AGAETE', Direccion: 'C/ LAUREADO GENERAL SERRA ALGARRA, 14', Telefono: '928-478864', CorreoElectronico: '35000011@gobiernodecanarias.org' },
+                { Codigo: '35007179', Denominacion: 'CEIP BEÑESMEN', Municipio: 'AGÜIMES', Direccion: 'C/ ANSITE, 2', Telefono: '928-599143', CorreoElectronico: '35007179@gobiernodecanarias.org' },
+                { Codigo: '35008494', Denominacion: 'CEIP LA VIÑUELA', Municipio: 'AGÜIMES', Direccion: 'CAMINO LA VIÑUELA, S/N', Telefono: '928-599195', CorreoElectronico: '35008494@gobiernodecanarias.org' },
+                { Codigo: '35000151', Denominacion: 'CEIP MARÍA MUÑOZ MAYOR', Municipio: 'AGÜIMES', Direccion: 'CTRA. GENERAL DEL SUR, S/N', Telefono: '928-478907', CorreoElectronico: '35000151@gobiernodecanarias.org' },
+                { Codigo: '35000124', Denominacion: 'CEIP MONTAÑA LOS VÉLEZ', Municipio: 'AGÜIMES', Direccion: 'C/ DALIA, S/N', Telefono: '928-599139', CorreoElectronico: '35000124@gobiernodecanarias.org' },
+                { Codigo: '35000057', Denominacion: 'CEIP ROQUE AGUAYRO', Municipio: 'AGÜIMES', Direccion: 'C/ MÉJICO, 20', Telefono: '928-117563', CorreoElectronico: '35000057@gobiernodecanarias.org' },
+                { Codigo: '35000161', Denominacion: 'CEIP TEMISAS', Municipio: 'AGÜIMES', Direccion: 'BDA. SAN MIGUEL, 52', Telefono: '928-393002', CorreoElectronico: '35000161@gobiernodecanarias.org' },
+                { Codigo: '35000112', Denominacion: 'CEIP VEINTE DE ENERO', Municipio: 'AGÜIMES', Direccion: 'C/ LUIS VELASCO, 83', Telefono: '928-118283', CorreoElectronico: '35000112@gobiernodecanarias.org' },
+                { Codigo: '35000136', Denominacion: 'CEP DORAMAS', Municipio: 'AGÜIMES', Direccion: 'C/ BENTEJUÍ, S/N', Telefono: '928-180526', CorreoElectronico: '35000136@gobiernodecanarias.org' },
+                { Codigo: '35008512', Denominacion: 'EEI JOSÉ MELIÁN RODRÍGUEZ', Municipio: 'AGÜIMES', Direccion: 'C/ TIRMA, S/N', Telefono: '928-181942 y 608-910907', CorreoElectronico: '35008512@gobiernodecanarias.org' },
+                { Codigo: '35015437', Denominacion: 'EEI SARANTONTÓN', Municipio: 'AGÜIMES', Direccion: 'C/ BELETÉN, 31', Telefono: '928-183897', CorreoElectronico: 'sramirez@aguimes.es' },
+                { Codigo: '35000331', Denominacion: 'CEIP ARTENARA', Municipio: 'ARTENARA', Direccion: 'C/ LOS COFRITOS, S/N', Telefono: '928-393023', CorreoElectronico: '35000331@gobiernodecanarias.org' },
+                { Codigo: '35015590', Denominacion: 'CEIP ARUCAS', Municipio: 'ARUCAS', Direccion: 'CARRETERA EL LOMO, 17', Telefono: '928-622860', CorreoElectronico: '35015590@gobiernodecanarias.org' },
+                { Codigo: '35000446', Denominacion: 'CEIP BAÑADEROS', Municipio: 'ARUCAS', Direccion: 'C/ DOCTOR ENRIQUE NÁCHER HERNÁNDEZ, 3', Telefono: '928-626536', CorreoElectronico: '35000446@gobiernodecanarias.org' },
+                { Codigo: '35000458', Denominacion: 'CEIP EDUARDO RIVERO RAMOS', Municipio: 'ARUCAS', Direccion: 'C/ HNOS. MANRIQUE, 26', Telefono: '928-303363', CorreoElectronico: '35000458@gobiernodecanarias.org' },
+                { Codigo: '35005651', Denominacion: 'CEIP ESTRELLA BARREIRO MORENO', Municipio: 'ARUCAS', Direccion: 'C/ POETA CIPRIANO ACOSTA NAVARRO, S/N', Telefono: '928-578475', CorreoElectronico: '35005651@gobiernodecanarias.org' },
+                { Codigo: '35000367', Denominacion: 'CEIP LA GOLETA', Municipio: 'ARUCAS', Direccion: 'C/ SAN FERNANDO, 13', Telefono: '928-599166', CorreoElectronico: '35000367@gobiernodecanarias.org' },
+                { Codigo: '35000461', Denominacion: 'CEIP MANOLO ORTEGA', Municipio: 'ARUCAS', Direccion: 'PASAJE ECHEDEY, 1', Telefono: '928-393003 y 928-304580', CorreoElectronico: '35000461@gobiernodecanarias.org' },
+                { Codigo: '35010191', Denominacion: 'CEIP OROBAL', Municipio: 'ARUCAS', Direccion: 'C/ OBISPO MARQUINA, S/N', Telefono: '928-458310', CorreoElectronico: '35010191@gobiernodecanarias.org' },
+                { Codigo: '35000495', Denominacion: 'CEIP SANTIDAD', Municipio: 'ARUCAS', Direccion: 'C/ DORAMAS, 2', Telefono: '928-306984', CorreoElectronico: '35000495@gobiernodecanarias.org' },
+                { Codigo: '35000501', Denominacion: 'CEIP TRAPICHE', Municipio: 'ARUCAS', Direccion: 'PASEO DE SAN JOSÉ, 45', Telefono: '928-304579', CorreoElectronico: '35000501@gobiernodecanarias.org' },
+                { Codigo: '35009619', Denominacion: 'CEPA ARUCAS Y FIRGAS FERNANDO MARRERO PULIDO', Municipio: 'ARUCAS', Direccion: 'C/ HUELVA, 9', Telefono: '928-304382', CorreoElectronico: '35009619@gobiernodecanarias.org' },
+                { Codigo: '35000525', Denominacion: 'CEIP BUENLUGAR', Municipio: 'FIRGAS', Direccion: 'C/ ALMIRANTE CARRERO BLANCO, 1', Telefono: '928-303134', CorreoElectronico: '35000525@gobiernodecanarias.org' },
+                { Codigo: '35005560', Denominacion: 'CEIP PADILLA', Municipio: 'FIRGAS', Direccion: 'C/ PADILLA, 50', Telefono: '928-117083', CorreoElectronico: '35005560@gobiernodecanarias.org' },
+                { Codigo: '35000549', Denominacion: 'CEIP VILLA DE FIRGAS', Municipio: 'FIRGAS', Direccion: 'C/ SACRISTÁN AGUSTÍN ASENSIO GUERRA, 19', Telefono: '928-478640', CorreoElectronico: '35000549@gobiernodecanarias.org' },
+                { Codigo: '35007271', Denominacion: 'CEIP ALCALDE DIEGO TRUJILLO RODRÍGUEZ', Municipio: 'GÁLDAR', Direccion: 'AVDA. DE LOS CANTEROS, S/N', Telefono: '928-304581', CorreoElectronico: '35007271@gobiernodecanarias.org' },
+                { Codigo: '35000598', Denominacion: 'CEIP ANTONIO PADRÓN', Municipio: 'GÁLDAR', Direccion: 'C/ DRAGO, 17', Telefono: '928-303098', CorreoElectronico: '35000598@gobiernodecanarias.org' },
+                { Codigo: '35000574', Denominacion: 'CEIP CAIDEROS', Municipio: 'GÁLDAR', Direccion: 'C/ ALCALDE ROSAS CAIDEROS', Telefono: '928-117670', CorreoElectronico: '35000574@gobiernodecanarias.org' },
+                { Codigo: '35000586', Denominacion: 'CEIP FERNANDO GUANARTEME', Municipio: 'GÁLDAR', Direccion: 'C/ GUILLÉN MORALES, 15', Telefono: '928-303199', CorreoElectronico: '35000586@gobiernodecanarias.org' },
+                { Codigo: '35005501', Denominacion: 'CEIP HOYA DE PINEDA', Municipio: 'GÁLDAR', Direccion: 'C/ ALFARERA JULIANITA, S/N', Telefono: '928-393001', CorreoElectronico: '35005501@gobiernodecanarias.org' },
+                { Codigo: '35009413', Denominacion: 'CEIP LOS QUINTANA', Municipio: 'GÁLDAR', Direccion: 'C/ SILVA LINARES S/N', Telefono: '928-115644', CorreoElectronico: '35009413@gobiernodecanarias.org' },
+                { Codigo: '35008901', Denominacion: 'CEIP MAESTRO MANUEL CRUZ SAAVEDRA', Municipio: 'GÁLDAR', Direccion: 'C/ SANTO TOMÁS DE AQUINO, S/N', Telefono: '928-599300', CorreoElectronico: '35008901@gobiernodecanarias.org' },
+                { Codigo: '35000707', Denominacion: 'CEIP SAN ISIDRO', Municipio: 'GÁLDAR', Direccion: 'C/ GARCÍA LORCA, S/N', Telefono: '928-478881', CorreoElectronico: '35000707@gobiernodecanarias.org' },
+                { Codigo: '35005547', Denominacion: 'CEIP SARDINA DEL NORTE', Municipio: 'GÁLDAR', Direccion: 'C/ HERNÁN CORTÉS, S/N', Telefono: '928-899524', CorreoElectronico: '35005547@gobiernodecanarias.org' },
+                { Codigo: '35000719', Denominacion: 'CEIP SAUCILLO', Municipio: 'GÁLDAR', Direccion: 'CRUZ DEL POLEO, S/N', Telefono: '928-117139', CorreoElectronico: '35000719@gobiernodecanarias.org' },
+                { Codigo: '35008974', Denominacion: 'CEPA GÁLDAR', Municipio: 'GÁLDAR', Direccion: 'C/ TENESORA VIDIÑA, 17', Telefono: '928-882316', CorreoElectronico: '35008974@gobiernodecanarias.org' },
+                { Codigo: '35014950', Denominacion: 'EEI SAN ISIDRO', Municipio: 'GÁLDAR', Direccion: 'C/ SINDICO LORENZO Y VÁZQUEZ, S/N', Telefono: '928-550518', CorreoElectronico: 'einfantil@galdar.es' },
+                { Codigo: '35000768', Denominacion: 'CEIP AGUATONA', Municipio: 'INGENIO', Direccion: 'C/ GADIFER DE LA SALLE, S/N', Telefono: '928-303099', CorreoElectronico: '35000768@gobiernodecanarias.org' },
+                { Codigo: '35005584', Denominacion: 'CEIP BARRIO COSTA', Municipio: 'INGENIO', Direccion: 'C/ JUAN MEDINA GIRALDO, 6', Telefono: '928-304582', CorreoElectronico: '35005584@gobiernodecanarias.org' },
+                { Codigo: '35009267', Denominacion: 'CEIP BENITO PÉREZ GALDÓS', Municipio: 'INGENIO', Direccion: 'C/ JUAN NEGRÍN, S/N (CUESTA CABALLERO)', Telefono: '928-393063', CorreoElectronico: '35009267@gobiernodecanarias.org' },
+                { Codigo: '35006424', Denominacion: 'CEIP CHANO SÁNCHEZ', Municipio: 'INGENIO', Direccion: 'C/ TOMÁS DE IRIARTE, 5', Telefono: '928-211637 y 928-211638', CorreoElectronico: '35006424@gobiernodecanarias.org' },
+                { Codigo: '35000771', Denominacion: 'CEIP CLAUDIO DE LA TORRE', Municipio: 'INGENIO', Direccion: 'C/ JUAN DE AUSTRIA, S/N', Telefono: '928-781633', CorreoElectronico: '35000771@gobiernodecanarias.org' },
+                { Codigo: '35000781', Denominacion: 'CEIP DOCTOR JUAN ESPINO SÁNCHEZ', Municipio: 'INGENIO', Direccion: 'C/ DOCTOR J. ESPINO SÁNCHEZ, 4', Telefono: '928-781634', CorreoElectronico: '35000781@gobiernodecanarias.org' },
+                { Codigo: '35007283', Denominacion: 'CEIP LA PASTRANA', Municipio: 'INGENIO', Direccion: 'C/ ALCALDE ANTONIO HERNÁNDEZ RODRÍGUEZ, 38', Telefono: '928-780700', CorreoElectronico: '35007283@gobiernodecanarias.org' },
+                { Codigo: '35007878', Denominacion: 'CEIP POETA TOMÁS MORALES', Municipio: 'INGENIO', Direccion: 'C/ JUAN DE BETHENCOURT, 41', Telefono: '928-455975', CorreoElectronico: '35007878@gobiernodecanarias.org' },
+                { Codigo: '35006436', Denominacion: 'CEIP PROFESOR CARLOS SOCAS MUÑOZ', Municipio: 'INGENIO', Direccion: 'AVDA. DE AMÉRICA, 122', Telefono: '928-325381', CorreoElectronico: '35006436@gobiernodecanarias.org' },
+                { Codigo: '35008962', Denominacion: 'CEPA AGÜIMES-INGENIO', Municipio: 'INGENIO', Direccion: 'C/ ALCALDE ANTONIO HDEZ. RGUEZ., 35', Telefono: '928-784214', CorreoElectronico: '35008962@gobiernodecanarias.org' },
+                { Codigo: '35015361', Denominacion: 'EEI CARRIZAL', Municipio: 'INGENIO', Direccion: 'C/ ARCIPRESTE DE HITA, 8', Telefono: '928-780076 y 928-784726', CorreoElectronico: 'escuelasinfantiles@ingenio.es' },
+                { Codigo: '35004907', Denominacion: 'CEIP LA CARDONERA', Municipio: 'LA ALDEA DE SAN NICOLÁS', Direccion: 'C/ BENTEJUI, 90', Telefono: '928-599271', CorreoElectronico: '35004907@gobiernodecanarias.org' },
+                { Codigo: '35003851', Denominacion: 'CEIP LA LADERA', Municipio: 'LA ALDEA DE SAN NICOLÁS', Direccion: 'C/ ALEGRANZA, 7', Telefono: '928-325403', CorreoElectronico: '35003851@gobiernodecanarias.org' },
+                { Codigo: '35004932', Denominacion: 'CEIP TASARTE', Municipio: 'LA ALDEA DE SAN NICOLÁS', Direccion: 'C/ EL CASTILLO, 39', Telefono: '928-303102', CorreoElectronico: '35004932@gobiernodecanarias.org' },
+                { Codigo: '35007118', Denominacion: 'CEIP VIRGEN DEL CARMEN', Municipio: 'LA ALDEA DE SAN NICOLÁS', Direccion: 'AVDA. LOS CARDONES, 12', Telefono: '928-303341', CorreoElectronico: '35007118@gobiernodecanarias.org' },
+                { Codigo: '35010026', Denominacion: 'CEPA LA ALDEA', Municipio: 'LA ALDEA DE SAN NICOLÁS', Direccion: 'C/ FRANCISCO LEÓN HERRERA, 2', Telefono: '928-892485', CorreoElectronico: '35010026@gobiernodecanarias.org' },
+                { Codigo: '35008536', Denominacion: 'CEAD PROFESOR FÉLIX PÉREZ PARRILLA', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ DOCTOR GARCÍA CASTRILLO, 22', Telefono: '928-245743 y 928-290345', CorreoElectronico: '35008536@gobiernodecanarias.org' },
+                { Codigo: '35005420', Denominacion: 'CEIP ADÁN DEL CASTILLO', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'PASEO DE LOS MÁRTIRES, 4', Telefono: '928-304078', CorreoElectronico: '35005420@gobiernodecanarias.org' },
+                { Codigo: '35003459', Denominacion: 'CEIP ADELA SANTANA', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'CALLE LAS MAGNOLIAS, 12', Telefono: '928-304417', CorreoElectronico: '35003459@gobiernodecanarias.org' },
+                { Codigo: '35008721', Denominacion: 'CEIP AGUADULCE', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ MOLINO DE VIENTO, 18', Telefono: '928-599212', CorreoElectronico: '35008721@gobiernodecanarias.org' },
+                { Codigo: '35001487', Denominacion: 'CEIP ALCALDE RAMÍREZ BETHENCOURT', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ JUAN SARAZA ORTIZ, 4', Telefono: '928-115616', CorreoElectronico: '35001487@gobiernodecanarias.org' },
+                { Codigo: '35009905', Denominacion: 'CEIP ALCARAVANERAS', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ BARCELONA, 4, ESQ. LUIS ANTÚNEZ', Telefono: '928-478814 y 928-478815', CorreoElectronico: '35009905@gobiernodecanarias.org' },
+                { Codigo: '35008718', Denominacion: 'CEIP ALCORAC HENRÍQUEZ', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'BATERÍA DE SAN JUAN, 1', Telefono: '928-304501', CorreoElectronico: '35008718@gobiernodecanarias.org' },
+                { Codigo: '35010300', Denominacion: 'CEIP ALFREDO KRAUS', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ VENTURA DORESTE, S/N - LOMO LOS FRAILES', Telefono: '928-599301', CorreoElectronico: '35010300@gobiernodecanarias.org' },
+                { Codigo: '35014494', Denominacion: 'CEIP ALISIOS', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ DOCTOR SVENTENIUS, 1', Telefono: '928-314765', CorreoElectronico: '35014494@gobiernodecanarias.org' },
+                { Codigo: '35002893', Denominacion: 'CEIP ARAGÓN', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ ALEXIS CARREL, 45', Telefono: '928-599190', CorreoElectronico: '35002893@gobiernodecanarias.org' },
+                { Codigo: '35001086', Denominacion: 'CEIP ASTURIAS', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'BARRANCO DE TAURO, 2A CASA AYALA', Telefono: '928-478927', CorreoElectronico: '35001086@gobiernodecanarias.org' },
+                { Codigo: '35008706', Denominacion: 'CEIP ATLÁNTIDA', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'AVDA. PARQUE CENTRAL,17', Telefono: '928-599160', CorreoElectronico: '35008706@gobiernodecanarias.org' },
+                { Codigo: '35007441', Denominacion: 'CEIP BUENAVISTA I', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ ALBERTO GARCÍA IBÁÑEZ, 2', Telefono: '928-304585', CorreoElectronico: '35007441@gobiernodecanarias.org' },
+                { Codigo: '35001396', Denominacion: 'CEIP CATALUÑA', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ FARMACÉUTICO M. PADILLA, S/N', Telefono: '928-599152', CorreoElectronico: '35001396@gobiernodecanarias.org' },
+                { Codigo: '35001244', Denominacion: 'CEIP CERVANTES', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ GRANADERA CANARIA, 11', Telefono: '928-312109', CorreoElectronico: '35001244@gobiernodecanarias.org' },
+                { Codigo: '35008147', Denominacion: 'CEIP CÉSAR MANRIQUE', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ VIRGEN DEL PILAR, 35', Telefono: '928-118500', CorreoElectronico: '35008147@gobiernodecanarias.org' },
+                { Codigo: '35006850', Denominacion: 'CEIP CIUDAD DEL CAMPO', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'CTRA. TEROR, 58', Telefono: '928-211373', CorreoElectronico: '35006850@gobiernodecanarias.org' },
+                { Codigo: '35008135', Denominacion: 'CEIP DOCTOR JUAN NEGRÍN', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ CONCEJAL ANDRÉS ALVARADO JANINA, 21', Telefono: '928-304577', CorreoElectronico: '35008135@gobiernodecanarias.org' },
+                { Codigo: '35001311', Denominacion: 'CEIP DON BENITO', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ SOR SIMONA, 1', Telefono: '928-252251', CorreoElectronico: '35001311@gobiernodecanarias.org' },
+                { Codigo: '35006278', Denominacion: 'CEIP EL TOSCÓN', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ EL CARPINTERO, 27', Telefono: '928-655993', CorreoElectronico: '35006278@gobiernodecanarias.org' },
+                { Codigo: '35001050', Denominacion: 'CEIP EL ZARDO', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ TISCAMANITA, 13', Telefono: '928-599161', CorreoElectronico: '35001050@gobiernodecanarias.org' },
+                { Codigo: '35001281', Denominacion: 'CEIP ESCALERITAS', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ DOCTOR WOELFEL, 6', Telefono: '928-478560 y 928-478559', CorreoElectronico: '35001281@gobiernodecanarias.org' },
+                { Codigo: '35015280', Denominacion: 'CEIP EUROPA-NÉSTOR ÁLAMO', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'AVDA. LAS RAMBLAS DE JINÁMAR', Telefono: '928-715916', CorreoElectronico: '35015280@gobiernodecanarias.org' },
+                { Codigo: '35006591', Denominacion: 'CEIP FEDERICO GARCÍA LORCA', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ ALMIRANTE BENÍTEZ INGLOTT, 1', Telefono: '928-304083', CorreoElectronico: '35006591@gobiernodecanarias.org' },
+                { Codigo: '35001268', Denominacion: 'CEIP FERNANDO GUANARTEME', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ PAVÍA, 22', Telefono: '928-599030', CorreoElectronico: '35001268@gobiernodecanarias.org' },
+                { Codigo: '35001578', Denominacion: 'CEIP GALICIA', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ DON QUIJOTE DE LA MANCHA, 43', Telefono: '928-463231', CorreoElectronico: '35001578@gobiernodecanarias.org' },
+                { Codigo: '35001219', Denominacion: 'CEIP GINER DE LOS RÍOS', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ STA. JUANA DE ARCO, 3', Telefono: '928-244624 y 928-246189', CorreoElectronico: '35001219@gobiernodecanarias.org' },
+                { Codigo: '35007453', Denominacion: 'CEIP GRAN CANARIA', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ LUIS BENÍTEZ INGLOTT, 10', Telefono: '928-599064', CorreoElectronico: '35007453@gobiernodecanarias.org' },
+                { Codigo: '35009541', Denominacion: 'CEIP HOYA ANDREA', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ PLUTÓN, S/N', Telefono: '928-211794', CorreoElectronico: '35009541@gobiernodecanarias.org' },
+                { Codigo: '35006621', Denominacion: 'CEIP IBERIA', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ PROFESOR AGUSTÍN MILLARES CARLÓ,16', Telefono: '928-393179', CorreoElectronico: '35006621@gobiernodecanarias.org' },
+                { Codigo: '35008743', Denominacion: 'CEIP JOSÉ PÉREZ Y PÉREZ', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ SARGENTO PROVISIONAL, S/N', Telefono: '928-303017', CorreoElectronico: '35008743@gobiernodecanarias.org' },
+                { Codigo: '35001074', Denominacion: 'CEIP LA CALZADA', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'CAMINO EL BARRANCO, S/N', Telefono: '928-393028', CorreoElectronico: '35001074@gobiernodecanarias.org' },
+                { Codigo: '35001271', Denominacion: 'CEIP LAS CANTERAS', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ AMÉRICO VESPUCIO, 39', Telefono: '928-429794', CorreoElectronico: '35001271@gobiernodecanarias.org' },
+                { Codigo: '35009449', Denominacion: 'CEIP LAS MESAS', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ PUNTA DEL HIDALGO, S/N', Telefono: '928-211662 y 928-211661', CorreoElectronico: '35009449@gobiernodecanarias.org' },
+                { Codigo: '35014834', Denominacion: 'CEIP LAS REHOYAS', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ MONTEJURRA, 1', Telefono: '928-325391', CorreoElectronico: '35014834@gobiernodecanarias.org' },
+                { Codigo: '35007431', Denominacion: 'CEIP LAS TORRES', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ AMAPOLA, 11. URB. LAS TORRES', Telefono: '928-115781', CorreoElectronico: '35007431@gobiernodecanarias.org' },
+                { Codigo: '35001301', Denominacion: 'CEIP LEÓN Y CASTILLO', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ GUAYEDRA, 17 - OSORIO, 56', Telefono: '928-478795', CorreoElectronico: '35001301@gobiernodecanarias.org' },
+                { Codigo: '35001062', Denominacion: 'CEIP LOS ALTOS', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ RAMÓN GARCÍA, 16', Telefono: '928-303129', CorreoElectronico: '35001062@gobiernodecanarias.org' },
+                { Codigo: '35008160', Denominacion: 'CEIP LOS GILES', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ SÁHARA, 40', Telefono: '928-304593', CorreoElectronico: '35008160@gobiernodecanarias.org' },
+                { Codigo: '35008093', Denominacion: 'CEIP LOS TARAHALES', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'VUELTA DE LOS TARAHALES, 1', Telefono: '928-211564', CorreoElectronico: '35008093@gobiernodecanarias.org' },
+                { Codigo: '35003605', Denominacion: 'CEIP MARÍA JESÚS PÉREZ MORALES', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'LOMO LA VIUDA, 77', Telefono: '928-304092', CorreoElectronico: '35003605@gobiernodecanarias.org' },
+                { Codigo: '35014639', Denominacion: 'CEIP MARTÍN CHIRINO', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ LOMO LA PLANA, 47', Telefono: '928-211945', CorreoElectronico: '35014639@gobiernodecanarias.org' },
+                { Codigo: '35007881', Denominacion: 'CEIP MESA Y LÓPEZ', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ JESÚS FERRER JIMENO, 15', Telefono: '928-478896 y 928-478854', CorreoElectronico: '35007881@gobiernodecanarias.org' },
+                { Codigo: '35007684', Denominacion: 'CEIP NANDA CAMBRES', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ CARVAJAL, 57', Telefono: '928-303300', CorreoElectronico: '35007684@gobiernodecanarias.org' },
+                { Codigo: '35006448', Denominacion: 'CEIP NÉSTOR DE LA TORRE', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ JOAQUÍN BELÓN, 26', Telefono: '928-393192', CorreoElectronico: '35006448@gobiernodecanarias.org' },
+                { Codigo: '35001347', Denominacion: 'CEIP PEPE DÁMASO', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ MARIUCHA, 84', Telefono: '928-478807', CorreoElectronico: '35001347@gobiernodecanarias.org' },
+                { Codigo: '35015516', Denominacion: 'CEIP PERSEIDAS', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ MANUEL DE FALLA, S/N', Telefono: '928-117851', CorreoElectronico: '35015516@gobiernodecanarias.org' },
+                { Codigo: '35007763', Denominacion: 'CEIP PINTOR MANOLO MILLARES', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'AVDA. PEDRO HIDALGO, 1', Telefono: '928-599273', CorreoElectronico: '35007763@gobiernodecanarias.org' },
+                { Codigo: '35008639', Denominacion: 'CEIP PINTOR NÉSTOR', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ PADRE PAUL EMILIO MOLINA RÍOS, 2', Telefono: '928-304086', CorreoElectronico: '35008639@gobiernodecanarias.org' },
+                { Codigo: '35005419', Denominacion: 'CEIP SALVADOR MANRIQUE DE LARA', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ BRUNO NARANJO DÍAZ, 13', Telefono: '928-455796', CorreoElectronico: '35005419@gobiernodecanarias.org' },
+                { Codigo: '35001116', Denominacion: 'CEIP SAN JOSÉ ARTESANO', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ ANTº.PILDAIN ZAPIAIN, S/N', Telefono: '928-211806', CorreoElectronico: '35001116@gobiernodecanarias.org' },
+                { Codigo: '35005407', Denominacion: 'CEIP SAN LORENZO', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ ANTONIO MARTEL RODRÍGUEZ, 5', Telefono: '928-599106', CorreoElectronico: '35005407@gobiernodecanarias.org' },
+                { Codigo: '35007970', Denominacion: 'CEIP SANTA BÁRBARA', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ PINTOR JUAN GUILLERMO, S/N', Telefono: '928-263507', CorreoElectronico: '35007970@gobiernodecanarias.org' },
+                { Codigo: '35001323', Denominacion: 'CEIP SANTA CATALINA', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ ISLA DE CUBA, 27', Telefono: '928-303041', CorreoElectronico: '35001323@gobiernodecanarias.org' },
+                { Codigo: '35010178', Denominacion: 'CEIP SIETE PALMAS', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ LAS BORRERAS, 2 - URB. SIETE PALMAS', Telefono: '928-478728', CorreoElectronico: '35010178@gobiernodecanarias.org' },
+                { Codigo: '35003423', Denominacion: 'CEIP TEOBALDO POWER', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ FARMACÉUTICO PEDRO RIVERO, 1', Telefono: '928-599080', CorreoElectronico: '35003423@gobiernodecanarias.org' },
+                { Codigo: '35001372', Denominacion: 'CEIP TIMPLISTA JOSÉ ANTONIO RAMOS', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ CARMELO BETHENCOURT, 1-3', Telefono: '928-599377', CorreoElectronico: '35001372@gobiernodecanarias.org' },
+                { Codigo: '35003575', Denominacion: 'CEIP VALENCIA', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ HOYA AYALA, S/N', Telefono: '928-599124', CorreoElectronico: '35003575@gobiernodecanarias.org' },
+                { Codigo: '35015802', Denominacion: 'CEO ISLAS CANARIAS', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ ALICANTE, 34. SAN CRISTÓBAL', Telefono: '928-599184 y 928-599185', CorreoElectronico: '35015802@gobiernodecanarias.org' },
+                { Codigo: '35008691', Denominacion: 'CEO OMAYRA SÁNCHEZ', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'CTRA. MARZAGÁN. LLANOS BARRERA', Telefono: '928-393057', CorreoElectronico: '35008691@gobiernodecanarias.org' },
+                { Codigo: '35007982', Denominacion: 'CEPA LAS PALMAS', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ CARVAJAL, 2 TRASERA', Telefono: '928-599263', CorreoElectronico: '35007982@gobiernodecanarias.org' },
+                { Codigo: '35009632', Denominacion: 'CEPA LAS PALMAS-CIUDAD ALTA', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'CTRA. GENERAL DEL NORTE, 68. POL. CRUZ DE PIEDRA', Telefono: '928-251754 y 928-207055', CorreoElectronico: '35009632@gobiernodecanarias.org' },
+                { Codigo: '35009644', Denominacion: 'CEPA LAS PALMAS-CONO SUR', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ ALICANTE, 20', Telefono: '928-314981', CorreoElectronico: '35009644@gobiernodecanarias.org' },
+                { Codigo: '35010324', Denominacion: 'CEPA LAS PALMAS-TAMARACEITE', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ JERICÓ, 7 (LOMO LOS FRAILES)', Telefono: '928-437010 y 928-436930', CorreoElectronico: '35010324@gobiernodecanarias.org' },
+                { Codigo: '35006254', Denominacion: 'CEP GUTIÉRREZ RUBALCAVA', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ PALMA DE MALLORCA, 26', Telefono: '928-307039', CorreoElectronico: '35006254@gobiernodecanarias.org' },
+                { Codigo: '35006266', Denominacion: 'EEI ALMIRANTE ANTEQUERA', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ CÓRDOBA, 13. SAN CRISTÓBAL', Telefono: '928-311101', CorreoElectronico: '35006266@gobiernodecanarias.org' },
+                { Codigo: '35015413', Denominacion: 'EEI BAMBI', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ LICENCIADO AGUSTÍN RODRÍGUEZ, 3', Telefono: '645-296064', CorreoElectronico: 'bambi@trasaservicios.es' },
+                { Codigo: '35015656', Denominacion: 'EEI BLANCANIEVES', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ DOCTOR JIMÉNEZ NEYRA, 35', Telefono: '623-222084', CorreoElectronico: 'blancanieves@trasaservicios.es' },
+                { Codigo: '35014408', Denominacion: 'EEI DUMBO', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'CTRA. CIUDAD DE SAN JUAN DE DIOS, S/N', Telefono: '623-227017', CorreoElectronico: 'dumbo@trasaservicios.es' },
+                { Codigo: '35014330', Denominacion: 'EEI GRUMETE', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ CARVAJAL, 1 BAJO', Telefono: '928-230618', CorreoElectronico: 'reasperlaspalmas@fn.mde.es' },
+                { Codigo: '35014381', Denominacion: 'EEI HEIDI (SCHAMANN)', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ DOCTOR MARAÑÓN, S/N', Telefono: '623-224797', CorreoElectronico: 'heidi@trasaservicios.es' },
+                { Codigo: '35015383', Denominacion: 'EEI LA CARRUCHA', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ CORONEL ROCHA, 45', Telefono: '623-222041', CorreoElectronico: 'lacarrucha@trasaservicios.es' },
+                { Codigo: '35014391', Denominacion: 'EEI LA SIRENITA (TAMARACEITE)', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ PINTOR JOSÉ JORGE ORAMAS, 7', Telefono: '633-438208', CorreoElectronico: 'lasirenita@trasaservicios.es' },
+                { Codigo: '35015644', Denominacion: 'EEI LOS PITUFOS', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ OBISPO MARQUINA, 3', Telefono: '623-224909', CorreoElectronico: 'lospitufos@trasaservicios.es' },
+                { Codigo: '35015395', Denominacion: 'EEI PINOCHO', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ SAN BORONDÓN, 15', Telefono: '623-222039', CorreoElectronico: 'pinocho@trasaservicios.es' },
+                { Codigo: '35014411', Denominacion: 'EEI PLUTO (B. ATLÁNTICO)', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ PERPENDICULAR A C/ DIEGO BETANCOR SUAREZ - Bº DEL ATLÁNTICO', Telefono: '633-438234', CorreoElectronico: 'pluto@trasaservicios.es' },
+                { Codigo: '35014378', Denominacion: 'EEI POCAHONTAS (SARAMAGO)', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ HOYA DEL ENAMORADO, 9', Telefono: '623-392323', CorreoElectronico: 'pocahontas@trasaservicios.es' },
+                { Codigo: '35015632', Denominacion: 'EEI PRINCESA TENESOYA', Municipio: 'LAS PALMAS DE GRAN CANARIA', Direccion: 'C/ DEBUSSY, S/N', Telefono: '623-222046', CorreoElectronico: 'princesatenesoya@trasaservicios.es' },
+                { Codigo: '35009000', Denominacion: 'CEIP ARTEMI SEMIDÁN', Municipio: 'MOGÁN', Direccion: 'C/TAMARÁN, Nº59', Telefono: '928-599197', CorreoElectronico: '35009000@gobiernodecanarias.org' },
+                { Codigo: '35005675', Denominacion: 'CEIP CASAS DE VENEGUERA', Municipio: 'MOGÁN', Direccion: 'DAMIÁN GONZÁLEZ SUÁREZ, 3.', Telefono: '928-393051', CorreoElectronico: '35005675@gobiernodecanarias.org' },
+                { Codigo: '35000859', Denominacion: 'CEIP PLAYA DE ARGUINEGUÍN', Municipio: 'MOGÁN', Direccion: 'C/ TANAUSÚ, 2', Telefono: '928-599253', CorreoElectronico: '35000859@gobiernodecanarias.org' },
+                { Codigo: '35000860', Denominacion: 'CEIP PLAYA DE MOGÁN', Municipio: 'MOGÁN', Direccion: 'C/ LA CRUZ, 3', Telefono: '928-565726', CorreoElectronico: '35000860@gobiernodecanarias.org' },
+                { Codigo: '35000835', Denominacion: 'CEO MOGÁN', Municipio: 'MOGÁN', Direccion: 'C/ EL MOCÁN, 36', Telefono: '928-306972', CorreoElectronico: '35000835@gobiernodecanarias.org' },
+                { Codigo: '35014159', Denominacion: 'CEO MOTOR GRANDE- ROSA PADRÓN PULIDO', Municipio: 'MOGÁN', Direccion: 'C/ LÉRIDA, 4', Telefono: '928-325483', CorreoElectronico: '35014159@gobiernodecanarias.org' },
+                { Codigo: '35009620', Denominacion: 'CEPA MOGÁN', Municipio: 'MOGÁN', Direccion: 'PLAZA DE LAS MARAÑUELAS, 7', Telefono: '928-578478', CorreoElectronico: '35009620@gobiernodecanarias.org' },
+                { Codigo: '35015863', Denominacion: 'EEI MARÍA JESÚS RAMÍREZ OSITOS', Municipio: 'MOGÁN', Direccion: 'C/ TAMARÁN, 57', Telefono: '928-158800', CorreoElectronico: 'escuelainfantilarg@mogan.es' },
+                { Codigo: '35014241', Denominacion: 'EEI MOGÁN', Municipio: 'MOGÁN', Direccion: 'AVDA. LOS MARREROS, 28', Telefono: '928-565982', CorreoElectronico: 'escuelainfantilmogan@mogansc.es' },
+                { Codigo: '35000914', Denominacion: 'CEIP AGUSTÍN HERNÁNDEZ DÍAZ', Municipio: 'MOYA', Direccion: 'C/ SECRETARIO JUAN GONZÁLEZ LEÓN, 7', Telefono: '928-303355', CorreoElectronico: '35000914@gobiernodecanarias.org' },
+                { Codigo: '35000872', Denominacion: 'CEIP CARRETERÍA', Municipio: 'MOYA', Direccion: 'C/ EL LOMO, 60', Telefono: '928-118947', CorreoElectronico: '35000872@gobiernodecanarias.org' },
+                { Codigo: '35000884', Denominacion: 'CEIP COSTA', Municipio: 'MOYA', Direccion: 'CTRA. LA COSTA, 28', Telefono: '928-655973', CorreoElectronico: '35000884@gobiernodecanarias.org' },
+                { Codigo: '35006783', Denominacion: 'CEIP FRONTÓN', Municipio: 'MOYA', Direccion: 'C/ CAMINO FRONTÓN, 152', Telefono: '928-611057 y 928-303348', CorreoElectronico: '35006783@gobiernodecanarias.org' },
+                { Codigo: '35000938', Denominacion: 'CEIP MANUEL BALBUENA PEDRAZA', Municipio: 'MOYA', Direccion: 'C/ JUAN MATEO DE CASTRO, 18', Telefono: '928-303008', CorreoElectronico: '35000938@gobiernodecanarias.org' },
+                { Codigo: '35006795', Denominacion: 'CEIP TRUJILLO', Municipio: 'MOYA', Direccion: 'C/ JUAN XXIII, 25', Telefono: '928-724779', CorreoElectronico: '35006795@gobiernodecanarias.org' },
+                { Codigo: '35007507', Denominacion: 'CEIP ALCALDE MARCIAL FRANCO', Municipio: 'SAN BARTOLOMÉ DE TIRAJANA', Direccion: 'C/ LA GOMERA, 2 - URB. LOS FAROLES', Telefono: '928-770654', CorreoElectronico: '35007507@gobiernodecanarias.org' },
+                { Codigo: '35005237', Denominacion: 'CEIP ALDEA BLANCA', Municipio: 'SAN BARTOLOMÉ DE TIRAJANA', Direccion: 'C/ GUMIDAFE, 8', Telefono: '928-393176', CorreoElectronico: '35005237@gobiernodecanarias.org' },
+                { Codigo: '35005833', Denominacion: 'CEIP CERCADO DE ESPINO', Municipio: 'SAN BARTOLOMÉ DE TIRAJANA', Direccion: 'C/ CERCADO DE ESPINOS, S/N', Telefono: '928-899786', CorreoElectronico: '35005833@gobiernodecanarias.org' },
+                { Codigo: '35004865', Denominacion: 'CEIP EL MATORRAL', Municipio: 'SAN BARTOLOMÉ DE TIRAJANA', Direccion: 'CUARTERÍAS DEL MATORRAL, 76', Telefono: '928-303140', CorreoElectronico: '35004865@gobiernodecanarias.org' },
+                { Codigo: '35013908', Denominacion: 'CEIP EL TABLERO', Municipio: 'SAN BARTOLOMÉ DE TIRAJANA', Direccion: 'AVDA. VEGA MONROY, Nº 21', Telefono: '928-143608', CorreoElectronico: '35013908@gobiernodecanarias.org' },
+                { Codigo: '35005249', Denominacion: 'CEIP JUAN GRANDE', Municipio: 'SAN BARTOLOMÉ DE TIRAJANA', Direccion: 'AVDA. DE LOS COLEGIOS, S/N', Telefono: '928-599274', CorreoElectronico: '35005249@gobiernodecanarias.org' },
+                { Codigo: '35007787', Denominacion: 'CEIP LAS DUNAS', Municipio: 'SAN BARTOLOMÉ DE TIRAJANA', Direccion: 'C/ MONTAÑA CLARA, 16', Telefono: '928-478906', CorreoElectronico: '35007787@gobiernodecanarias.org' },
+                { Codigo: '35008524', Denominacion: 'CEIP OASIS DE MASPALOMAS', Municipio: 'SAN BARTOLOMÉ DE TIRAJANA', Direccion: 'AVDA. ALEJANDRO CASTILLO, S/N', Telefono: '928-211667', CorreoElectronico: '35008524@gobiernodecanarias.org' },
+                { Codigo: '35007519', Denominacion: 'CEIP PEPE MONAGAS', Municipio: 'SAN BARTOLOMÉ DE TIRAJANA', Direccion: 'C/ LUJÁN PÉREZ , S/N', Telefono: '928-455032', CorreoElectronico: '35007519@gobiernodecanarias.org' },
+                { Codigo: '35003757', Denominacion: 'CEIP SAN FERNANDO DE MASPALOMAS', Municipio: 'SAN BARTOLOMÉ DE TIRAJANA', Direccion: 'AVDA. DE TEJEDA, 11', Telefono: '928-478585', CorreoElectronico: '35003757@gobiernodecanarias.org' },
+                { Codigo: '35003711', Denominacion: 'CEIP SANTA ÁGUEDA', Municipio: 'SAN BARTOLOMÉ DE TIRAJANA', Direccion: 'C/ EL PAJAR, S/N', Telefono: '928-303105', CorreoElectronico: '35003711@gobiernodecanarias.org' },
+                { Codigo: '35003733', Denominacion: 'CEO PANCHO GUERRA', Municipio: 'SAN BARTOLOMÉ DE TIRAJANA', Direccion: 'C/ VERTEGUI, 1', Telefono: '928-211660', CorreoElectronico: '35003733@gobiernodecanarias.org' },
+                { Codigo: '35003812', Denominacion: 'CEO TUNTE', Municipio: 'SAN BARTOLOMÉ DE TIRAJANA', Direccion: 'C/ MANUEL ZENÓN ARAÑA YÁNEZ, 12-14', Telefono: '928-211626 y 928-211623', CorreoElectronico: '35003812@gobiernodecanarias.org' },
+                { Codigo: '35009656', Denominacion: 'CEPA SAN BARTOLOMÉ DE TIRAJANA', Municipio: 'SAN BARTOLOMÉ DE TIRAJANA', Direccion: 'C/ PARTERA LEONORITA, S/N', Telefono: '928-766680 y 928-767635', CorreoElectronico: '35009656@gobiernodecanarias.org' },
+                { Codigo: '35003903', Denominacion: 'CEIP JOSÉ MANUEL ILLERA DE LA MORA', Municipio: 'SANTA BRÍGIDA', Direccion: 'C/ SANTOÑA, 9', Telefono: '928-599163', CorreoElectronico: '35003903@gobiernodecanarias.org' },
+                { Codigo: '35003927', Denominacion: 'CEIP JUAN DEL RÍO AYALA', Municipio: 'SANTA BRÍGIDA', Direccion: 'C/ CIRCUNVALACIÓN, 1', Telefono: '928-303046', CorreoElectronico: '35003927@gobiernodecanarias.org' },
+                { Codigo: '35005250', Denominacion: 'CEIP LOLA MASSIEU LA ANGOSTURA', Municipio: 'SANTA BRÍGIDA', Direccion: 'EL TEJAR, S/N', Telefono: '928-599155', CorreoElectronico: '35005250@gobiernodecanarias.org' },
+                { Codigo: '35009668', Denominacion: 'CEPA SANTA BRÍGIDA', Municipio: 'SANTA BRÍGIDA', Direccion: 'C/ EL PARAÍSO 39-41', Telefono: '928-478837', CorreoElectronico: '35009668@gobiernodecanarias.org' },
+                { Codigo: '35003952', Denominacion: 'CEIP ANSITE', Municipio: 'SANTA LUCÍA DE TIRAJANA', Direccion: 'C/ ANDAMANA, 17', Telefono: '928-750900', CorreoElectronico: '35003952@gobiernodecanarias.org' },
+                { Codigo: '35006333', Denominacion: 'CEIP BALOS-DOMINGO SOCORRO', Municipio: 'SANTA LUCÍA DE TIRAJANA', Direccion: 'C/ TENERIFE, 82', Telefono: '928-304081 y 928-756520', CorreoElectronico: '35006333@gobiernodecanarias.org' },
+                { Codigo: '35008202', Denominacion: 'CEIP CAMINO DE LA MADERA', Municipio: 'SANTA LUCÍA DE TIRAJANA', Direccion: 'C/ VASCO DE GAMA, S/N', Telefono: '928-304084', CorreoElectronico: '35008202@gobiernodecanarias.org' },
+                { Codigo: '35003991', Denominacion: 'CEIP CASA PASTORES', Municipio: 'SANTA LUCÍA DE TIRAJANA', Direccion: 'C/ RUIZ DE ALARCÓN, S/N', Telefono: '928-304079', CorreoElectronico: '35003991@gobiernodecanarias.org' },
+                { Codigo: '35008184', Denominacion: 'CEIP EL CANARIO', Municipio: 'SANTA LUCÍA DE TIRAJANA', Direccion: 'C/ CANALEJAS, 19-21', Telefono: '928-304072', CorreoElectronico: '35008184@gobiernodecanarias.org' },
+                { Codigo: '35006345', Denominacion: 'CEIP LA CERRUDA', Municipio: 'SANTA LUCÍA DE TIRAJANA', Direccion: 'C/ AGAETE, 58', Telefono: '928-478982', CorreoElectronico: '35006345@gobiernodecanarias.org' },
+                { Codigo: '35008226', Denominacion: 'CEIP LA PAREDILLA', Municipio: 'SANTA LUCÍA DE TIRAJANA', Direccion: 'C/ LA GÜERA, S/N', Telefono: '928-478526', CorreoElectronico: '35008226@gobiernodecanarias.org' },
+                { Codigo: '35014101', Denominacion: 'CEIP LAS TEDERAS', Municipio: 'SANTA LUCÍA DE TIRAJANA', Direccion: 'C/ ACUSA ESQ. C/ TEOBALDO POWER', Telefono: '928-750084', CorreoElectronico: '35014101@gobiernodecanarias.org' },
+                { Codigo: '35013881', Denominacion: 'CEIP LA ZAFRA', Municipio: 'SANTA LUCÍA DE TIRAJANA', Direccion: 'C/ LOS LLANOS, 9', Telefono: '928-149926', CorreoElectronico: '35013881@gobiernodecanarias.org' },
+                { Codigo: '35009152', Denominacion: 'CEIP LOS LLANOS', Municipio: 'SANTA LUCÍA DE TIRAJANA', Direccion: 'C/ CENTRÍFUGA, S/N', Telefono: '928-304069', CorreoElectronico: '35009152@gobiernodecanarias.org' },
+                { Codigo: '35006886', Denominacion: 'CEIP POLICARPO BÁEZ', Municipio: 'SANTA LUCÍA DE TIRAJANA', Direccion: 'C/ CARMELO CALDERÍN, 8', Telefono: '928-752524 y 928-755908', CorreoElectronico: '35006886@gobiernodecanarias.org' },
+                { Codigo: '35003964', Denominacion: 'CEIP SANTA LUCÍA', Municipio: 'SANTA LUCÍA DE TIRAJANA', Direccion: 'C/ MAESTRA CLARA PÉREZ , 16', Telefono: '928-303001', CorreoElectronico: '35003964@gobiernodecanarias.org' },
+                { Codigo: '35004002', Denominacion: 'CEIP TAGOROR', Municipio: 'SANTA LUCÍA DE TIRAJANA', Direccion: 'C/ MANUEL BECERRA, 3', Telefono: '928-304075', CorreoElectronico: '35004002@gobiernodecanarias.org' },
+                { Codigo: '35008196', Denominacion: 'CEIP TAJINASTE', Municipio: 'SANTA LUCÍA DE TIRAJANA', Direccion: 'C/ TENERIFE, 84.- BARRANCO DE BALOS', Telefono: '928-304066', CorreoElectronico: '35008196@gobiernodecanarias.org' },
+                { Codigo: '35004956', Denominacion: 'CEIP TAMARÁN', Municipio: 'SANTA LUCÍA DE TIRAJANA', Direccion: 'C/ PRIMERO DE MAYO, 120', Telefono: '928-304090', CorreoElectronico: '35004956@gobiernodecanarias.org' },
+                { Codigo: '35007799', Denominacion: 'CEIP TINGUARO', Municipio: 'SANTA LUCÍA DE TIRAJANA', Direccion: 'C/ LA CERRUDA, 16', Telefono: '928-796280', CorreoElectronico: '35007799@gobiernodecanarias.org' },
+                { Codigo: '35015929', Denominacion: 'CEO EL CARDÓN', Municipio: 'SANTA LUCÍA DE TIRAJANA', Direccion: 'C/ ALMERÍA, 4', Telefono: '928-599340', CorreoElectronico: '35015929@gobiernodecanarias.org' },
+                { Codigo: '35008986', Denominacion: 'CEPA SANTA LUCÍA DE TIRAJANA', Municipio: 'SANTA LUCÍA DE TIRAJANA', Direccion: 'C/ PÍO X, 22', Telefono: '928-753970 y 928-755744', CorreoElectronico: '35008986@gobiernodecanarias.org' },
+                { Codigo: '35015450', Denominacion: 'EEI EL CANARIO', Municipio: 'SANTA LUCÍA DE TIRAJANA', Direccion: 'C/ CANALEJAS, 48 A', Telefono: '928-753407', CorreoElectronico: 'escuelasinfantiles@santaluciagc.com' },
+                { Codigo: '35015462', Denominacion: 'EEI EL DOCTORAL', Municipio: 'SANTA LUCÍA DE TIRAJANA', Direccion: 'C/ LOS POCEROS, 1', Telefono: '928-753406', CorreoElectronico: 'escuelasinfantiles@santaluciagc.com' },
+                { Codigo: '35015449', Denominacion: 'EEI LOS LLANOS', Municipio: 'SANTA LUCÍA DE TIRAJANA', Direccion: 'C/ LOS LLANOS, 44', Telefono: '928-790219', CorreoElectronico: 'escuelasinfantiles@santaluciagc.com' },
+                { Codigo: '35004166', Denominacion: 'CEIP JUAN ARENCIBIA SOSA', Municipio: 'SANTA MARÍA DE GUÍA DE GRAN CANARIA', Direccion: 'C/ MIGUEL RODRÍGUEZ, S/N', Telefono: '928-306582', CorreoElectronico: '35004166@gobiernodecanarias.org' },
+                { Codigo: '35004099', Denominacion: 'CEIP LA DEHESA - SAN JUAN', Municipio: 'SANTA MARÍA DE GUÍA DE GRAN CANARIA', Direccion: 'C/ SANTA BÁRBARA, 29', Telefono: '928-899777', CorreoElectronico: '35004099@gobiernodecanarias.org' },
+                { Codigo: '35006451', Denominacion: 'CEIP LUIS CORTÍ', Municipio: 'SANTA MARÍA DE GUÍA DE GRAN CANARIA', Direccion: 'AVDA. ATALAYA-BECERRIL, 11', Telefono: '928-304590', CorreoElectronico: '35006451@gobiernodecanarias.org' },
+                { Codigo: '35006461', Denominacion: 'CEIP MIGUEL DE SANTIAGO', Municipio: 'SANTA MARÍA DE GUÍA DE GRAN CANARIA', Direccion: 'C/ CRONISTA PEDRO GONZÁLEZ SOSA,16 - BARRIO S. ROQUE', Telefono: '928-211835', CorreoElectronico: '35006461@gobiernodecanarias.org' },
+                { Codigo: '35004154', Denominacion: 'CEIP NICOLÁS AGUIAR JIMÉNEZ', Municipio: 'SANTA MARÍA DE GUÍA DE GRAN CANARIA', Direccion: 'AVDA. DE LA JUVENTUD, 8', Telefono: '928-882292 y 928-551533', CorreoElectronico: '35004154@gobiernodecanarias.org' },
+                { Codigo: '35004063', Denominacion: 'CEIP PIEDRA DE MOLINO', Municipio: 'SANTA MARÍA DE GUÍA DE GRAN CANARIA', Direccion: 'C/ PIEDRA DE MOLINO, 31', Telefono: '928-393025', CorreoElectronico: '35004063@gobiernodecanarias.org' },
+                { Codigo: '35004041', Denominacion: 'CEO LUJÁN PÉREZ', Municipio: 'SANTA MARÍA DE GUÍA DE GRAN CANARIA', Direccion: 'CASA AGUILAR, 1', Telefono: '928-599370', CorreoElectronico: '35004041@gobiernodecanarias.org' },
+                { Codigo: '35004245', Denominacion: 'CEO TEJEDA', Municipio: 'TEJEDA', Direccion: 'C/GALINDO, 12', Telefono: '928-211765 y 928-666213', CorreoElectronico: '35004245@gobiernodecanarias.org' },
+                { Codigo: '35005021', Denominacion: 'CEIP AGUSTÍN MANRIQUE DE LARA', Municipio: 'TELDE', Direccion: 'C/ DOÑA LUISA, 1', Telefono: '928-303128', CorreoElectronico: '35005021@gobiernodecanarias.org' },
+                { Codigo: '35004348', Denominacion: 'CEIP AMELIA VEGA MONZÓN', Municipio: 'TELDE', Direccion: 'CTRA. DE LOS PICOS, 37. EL EJIDO', Telefono: '928-693982', CorreoElectronico: '35004348@gobiernodecanarias.org' },
+                { Codigo: '35005961', Denominacion: 'CEIP DOCTOR GREGORIO CHIL Y NARANJO', Municipio: 'TELDE', Direccion: 'C/ VELARDE, 43', Telefono: '928-694396 y 679-768235', CorreoElectronico: '35005961@gobiernodecanarias.org' },
+                { Codigo: '35004312', Denominacion: 'CEIP DOCTOR HERNÁNDEZ BENÍTEZ', Municipio: 'TELDE', Direccion: 'C/ TOMÁS DE IRIARTE, S/N', Telefono: '822-171707', CorreoElectronico: '35004312@gobiernodecanarias.org' },
+                { Codigo: '35005006', Denominacion: 'CEIP EL GORO', Municipio: 'TELDE', Direccion: 'C/ SÉNECA, 16', Telefono: '928-211346', CorreoElectronico: '35005006@gobiernodecanarias.org' },
+                { Codigo: '35004257', Denominacion: 'CEIP ESTEBAN NAVARRO SÁNCHEZ', Municipio: 'TELDE', Direccion: 'C/ ESTEBAN NAVARRO, 10', Telefono: '928-306588 y 928-306589', CorreoElectronico: '35004257@gobiernodecanarias.org' },
+                { Codigo: '35004324', Denominacion: 'CEIP FERNANDO LEÓN Y CASTILLO', Municipio: 'TELDE', Direccion: 'C/ ALFONSO DE ARMAS AYALA, 11', Telefono: '928-303557', CorreoElectronico: '35004324@gobiernodecanarias.org' },
+                { Codigo: '35009462', Denominacion: 'CEIP HILDA ZUDÁN', Municipio: 'TELDE', Direccion: 'C/ FERNANDO SAGASETA, 29', Telefono: '928-303304', CorreoElectronico: '35009462@gobiernodecanarias.org' },
+                { Codigo: '35008925', Denominacion: 'CEIP JINÁMAR FASE V', Municipio: 'TELDE', Direccion: 'C/ JULIO CARO BAROJA, 2', Telefono: '928-117624', CorreoElectronico: '35008925@gobiernodecanarias.org' },
+                { Codigo: '35004270', Denominacion: 'CEIP JOSÉ TEJERA SANTANA', Municipio: 'TELDE', Direccion: 'C/ SALAMANCA, 1', Telefono: '928-393174', CorreoElectronico: '35004270@gobiernodecanarias.org' },
+                { Codigo: '35006357', Denominacion: 'CEIP JUAN NEGRÍN', Municipio: 'TELDE', Direccion: 'PLAZA J. PAUL SARTRE, 1', Telefono: '928-078088', CorreoElectronico: '35006357@gobiernodecanarias.org' },
+                { Codigo: '35010002', Denominacion: 'CEIP LA GARITA', Municipio: 'TELDE', Direccion: 'C/ PALMERA, S/N', Telefono: '928-304070', CorreoElectronico: '35010002@gobiernodecanarias.org' },
+                { Codigo: '35007143', Denominacion: 'CEIP LAS BREÑAS', Municipio: 'TELDE', Direccion: 'C/ CEREZO, S/N', Telefono: '928-655999', CorreoElectronico: '35007143@gobiernodecanarias.org' },
+                { Codigo: '35006941', Denominacion: 'CEIP LOS CASERONES', Municipio: 'TELDE', Direccion: 'C/ DUERO, 2', Telefono: '928-304594', CorreoElectronico: '35006941@gobiernodecanarias.org' },
+                { Codigo: '35005031', Denominacion: 'CEIP LUCÍA JIMÉNEZ OLIVA', Municipio: 'TELDE', Direccion: 'C/ ÁLVAREZ QUINTERO, 1', Telefono: '928-599127', CorreoElectronico: '35005031@gobiernodecanarias.org' },
+                { Codigo: '35007301', Denominacion: 'CEIP MAESTRO FÉLIX SANTANA', Municipio: 'TELDE', Direccion: 'C/ DOS DE MAYO, 83', Telefono: '928-393171', CorreoElectronico: '35007301@gobiernodecanarias.org' },
+                { Codigo: '35005614', Denominacion: 'CEIP MARÍA JESÚS RAMÍREZ DÍAZ', Municipio: 'TELDE', Direccion: 'C/ CÁNOVAS DEL CASTILLO, 67', Telefono: '928-599165', CorreoElectronico: '35005614@gobiernodecanarias.org' },
+                { Codigo: '35004294', Denominacion: 'CEIP MARÍA SUÁREZ FIOL', Municipio: 'TELDE', Direccion: 'C/ GUILLERMO MARCONI, 1', Telefono: '928-599134', CorreoElectronico: '35004294@gobiernodecanarias.org' },
+                { Codigo: '35007829', Denominacion: 'CEIP MARPEQUEÑA', Municipio: 'TELDE', Direccion: 'C/ SAN AGUSTÍN, 73', Telefono: '928-118012 y 928-130274', CorreoElectronico: '35007829@gobiernodecanarias.org' },
+                { Codigo: '35009012', Denominacion: 'CEIP MONTAÑA LAS PALMAS', Municipio: 'TELDE', Direccion: 'C/ TRONCHADA, 9', Telefono: '928-393000', CorreoElectronico: '35009012@gobiernodecanarias.org' },
+                { Codigo: '35004282', Denominacion: 'CEIP PADRE COLLADO', Municipio: 'TELDE', Direccion: 'CTRA. GENERAL. LOMO MAGULLO, S/N', Telefono: '928-694725', CorreoElectronico: '35004282@gobiernodecanarias.org' },
+                { Codigo: '35008275', Denominacion: 'CEIP PEDRO LEZCANO', Municipio: 'TELDE', Direccion: 'C/ TAMARA, 1', Telefono: '928-117608', CorreoElectronico: '35008275@gobiernodecanarias.org' },
+                { Codigo: '35007817', Denominacion: 'CEIP PLÁCIDO FLEITAS', Municipio: 'TELDE', Direccion: 'C/ EL ROQUE, 2', Telefono: '928-306577 y 928-306578', CorreoElectronico: '35007817@gobiernodecanarias.org' },
+                { Codigo: '35004336', Denominacion: 'CEIP POETA FERNANDO GONZÁLEZ', Municipio: 'TELDE', Direccion: 'C/ LEÓN Y CASTILLO, 94', Telefono: '928-599135', CorreoElectronico: '35004336@gobiernodecanarias.org' },
+                { Codigo: '35008445', Denominacion: 'CEIP POETA FRANCISCO TARAJANO', Municipio: 'TELDE', Direccion: 'C/ NICOLÁS COPÉRNICO, 35', Telefono: '928-303322', CorreoElectronico: '35008445@gobiernodecanarias.org' },
+                { Codigo: '35006655', Denominacion: 'CEIP POETA MONTIANO PLACERES', Municipio: 'TELDE', Direccion: 'C/ MANUEL ALEMÁN ÁLAMO, S/N', Telefono: '928-599062 y 928-599061', CorreoElectronico: '35006655@gobiernodecanarias.org' },
+                { Codigo: '35004300', Denominacion: 'CEIP PRÍNCIPE DE ASTURIAS', Municipio: 'TELDE', Direccion: 'C/ LAS RUBIESAS, S/N', Telefono: '928-115833', CorreoElectronico: '35004300@gobiernodecanarias.org' },
+                { Codigo: '35004269', Denominacion: 'CEIP PROFESORA ADELINA FLORES MEDINA', Municipio: 'TELDE', Direccion: 'LOS MORROS, 2', Telefono: '928-899787', CorreoElectronico: '35004269@gobiernodecanarias.org' },
+                { Codigo: '35005043', Denominacion: 'CEIP SAN ANTONIO', Municipio: 'TELDE', Direccion: 'C/ LA PORTADA, 22', Telefono: '928-599099', CorreoElectronico: '35005043@gobiernodecanarias.org' },
+                { Codigo: '35006473', Denominacion: 'CEIP SAN JUAN', Municipio: 'TELDE', Direccion: 'C/ LEÓN Y CASTILLO, 75', Telefono: '928-694918', CorreoElectronico: '35006473@gobiernodecanarias.org' },
+                { Codigo: '35006311', Denominacion: 'CEIP SAULO TORÓN', Municipio: 'TELDE', Direccion: 'CALLE LEOPOLDO MASSIEU Nº 5', Telefono: '928-599150', CorreoElectronico: '35006311@gobiernodecanarias.org' },
+                { Codigo: '35008019', Denominacion: 'CEPA TELDE-CASCO', Municipio: 'TELDE', Direccion: 'C/ ANDRÉS MANJÓN, 21 (ALA SUR)', Telefono: '928-692273 y 928-693981', CorreoElectronico: '35008019@gobiernodecanarias.org' },
+                { Codigo: '35009671', Denominacion: 'CEPA TELDE-JINÁMAR', Municipio: 'TELDE', Direccion: 'C/ MANUEL ALEMÁN ÁLAMO, 3. VALLE DE JINÁMAR', Telefono: '928-796151', CorreoElectronico: '35009671@gobiernodecanarias.org' },
+                { Codigo: '35009681', Denominacion: 'CEPA TELDE-LA HERRADURA', Municipio: 'TELDE', Direccion: 'C/ FULTON, 40', Telefono: '928-683288', CorreoElectronico: '35009681@gobiernodecanarias.org' },
+                { Codigo: '35014172', Denominacion: 'EEI BASE AÉREA DE GANDO', Municipio: 'TELDE', Direccion: 'CARRETERA DEL SUR, KM 20', Telefono: '928-328434 y 928-328316', CorreoElectronico: 'ofap_ala46@mde.es' },
+                { Codigo: '35015899', Denominacion: 'EEI JINÁMAR', Municipio: 'TELDE', Direccion: 'C/ LOTUS KUNKELLI, 60', Telefono: '928-695284 y 828-013615', CorreoElectronico: 'escuelasinfantilestelde2020@gmail.com' },
+                { Codigo: '35015760', Denominacion: 'EEI LA HERRADURA', Municipio: 'TELDE', Direccion: 'C/ HOLANDA ESQUINA C/ ROQUE DEL EST', Telefono: '928-695271 y 828-013615', CorreoElectronico: 'escuelasinfantilestelde2020@gmail.com' },
+                { Codigo: '35015772', Denominacion: 'EEI LAS REMUDAS', Municipio: 'TELDE', Direccion: 'C/ RAFAEL ALBERTI ,NRO 1- RESIDENCIAL LAS REMUDAS', Telefono: '928-695273 y 828-013615', CorreoElectronico: 'escuelasinfantilestelde2020@gmail.com' },
+                { Codigo: '35004491', Denominacion: 'CEIP HUERTAS DEL PALMAR', Municipio: 'TEROR', Direccion: 'EL PALMAR, 80', Telefono: '928-303115', CorreoElectronico: '35004491@gobiernodecanarias.org' },
+                { Codigo: '35005456', Denominacion: 'CEIP MIRAFLOR', Municipio: 'TEROR', Direccion: 'C/ LOMO COBO, 11', Telefono: '928-304088', CorreoElectronico: '35005456@gobiernodecanarias.org' },
+                { Codigo: '35004518', Denominacion: 'CEIP MONSEÑOR SOCORRO LANTIGUA', Municipio: 'TEROR', Direccion: 'C/ JOSÉ MIRANDA GUERRA, 1', Telefono: '928-599188', CorreoElectronico: '35004518@gobiernodecanarias.org' },
+                { Codigo: '35009693', Denominacion: 'CEPA TEROR', Municipio: 'TEROR', Direccion: 'PLAZA DE SINTES, LOCAL 1', Telefono: '928-613498', CorreoElectronico: '35009693@gobiernodecanarias.org' },
+                { Codigo: '35004713', Denominacion: 'CEO VALLESECO', Municipio: 'VALLESECO', Direccion: 'C/ LOS MATOS, 24', Telefono: '928-599304', CorreoElectronico: '35004713@gobiernodecanarias.org' },
+                { Codigo: '35014342', Denominacion: 'EEI LA ESCUELITA', Municipio: 'VALLESECO', Direccion: 'C/ PÁRROCO MARRERO DÍAZ, S/N', Telefono: '928-619978', CorreoElectronico: 'guarderia@valleseco.es' },
+                { Codigo: '35004683', Denominacion: 'CEIP ELVIRA VAQUERO', Municipio: 'VALSEQUILLO DE GRAN CANARIA', Direccion: 'C/ MAESTRO JOSÉ SANTANA, 4', Telefono: '928-705230', CorreoElectronico: '35004683@gobiernodecanarias.org' },
+                { Codigo: '35004701', Denominacion: 'CEIP LAS VEGAS', Municipio: 'VALSEQUILLO DE GRAN CANARIA', Direccion: 'C/ F. DÍAZ BERTRANA, 3', Telefono: '928-599049', CorreoElectronico: '35004701@gobiernodecanarias.org' },
+                { Codigo: '35004658', Denominacion: 'CEIP LOS LLANETES', Municipio: 'VALSEQUILLO DE GRAN CANARIA', Direccion: 'C/ EL CEDRO, 2', Telefono: '928-304077', CorreoElectronico: '35004658@gobiernodecanarias.org' },
+                { Codigo: '35005471', Denominacion: 'CEIP TENTENIGUADA', Municipio: 'VALSEQUILLO DE GRAN CANARIA', Direccion: 'C/ SAN JUAN BAUTISTA, 33', Telefono: '928-303138', CorreoElectronico: '35005471@gobiernodecanarias.org' },
+                { Codigo: '35004695', Denominacion: 'CEIP VALLE DE SAN ROQUE', Municipio: 'VALSEQUILLO DE GRAN CANARIA', Direccion: 'VALLE DE SAN ROQUE, S/N', Telefono: '928-303015', CorreoElectronico: '35004695@gobiernodecanarias.org' },
+                { Codigo: '35006023', Denominacion: 'CEIP ARÍÑEZ', Municipio: 'VEGA DE SAN MATEO', Direccion: 'ARÍÑEZ, 8', Telefono: '928-303135', CorreoElectronico: '35006023@gobiernodecanarias.org' },
+                { Codigo: '35005481', Denominacion: 'CEIP LA LECHUZA', Municipio: 'VEGA DE SAN MATEO', Direccion: 'CTRA. LA LECHUZA, 5', Telefono: '928-117420', CorreoElectronico: '35005481@gobiernodecanarias.org' },
+                { Codigo: '35004737', Denominacion: 'CEIP LAS LAGUNETAS', Municipio: 'VEGA DE SAN MATEO', Direccion: 'C/ LOS GUINDEROS, 29', Telefono: '928-303132', CorreoElectronico: '35004737@gobiernodecanarias.org' },
+                { Codigo: '35004750', Denominacion: 'CEIP LA SOLANA', Municipio: 'VEGA DE SAN MATEO', Direccion: 'LA SOLANA', Telefono: '928-303131', CorreoElectronico: '35004750@gobiernodecanarias.org' },
+                { Codigo: '35004762', Denominacion: 'CEIP PROFESOR RAFAEL GÓMEZ SANTOS', Municipio: 'VEGA DE SAN MATEO', Direccion: 'CALLE DEL AGUA, 18', Telefono: '928-599138', CorreoElectronico: '35004762@gobiernodecanarias.org' },
+                { Codigo: '35004749', Denominacion: 'CEIP UTIACA', Municipio: 'VEGA DE SAN MATEO', Direccion: 'C/ UTIACA, 39', Telefono: '928-393035 y 928-661168', CorreoElectronico: '35004749@gobiernodecanarias.org' }
+
+                // TENERIFE
+                { "Codigo": "38008560", "Denominacion": "CEIP ABONA", "Municipio": "GRANADILLA DE ABONA", "Direccion": "C/ LA OROTAVA, 10", "Telefono": "922-391681", "CorreoElectronico": "38008560@gobiernodecanarias.org" },
+                { "Codigo": "38003392", "Denominacion": "CEIP ACENTEJO", "Municipio": "LA MATANZA DE ACENTEJO", "Direccion": "C/ LAS LIMERAS, 64", "Telefono": "922-951092 y 922-951093", "CorreoElectronico": "38003392@gobiernodecanarias.org" },
+                { "Codigo": "38000019", "Denominacion": "CEIP ADEJE", "Municipio": "ADEJE", "Direccion": "C/ MANUEL BELLO RAMOS, 14", "Telefono": "922-478763", "CorreoElectronico": "38000019@gobiernodecanarias.org" },
+                { "Codigo": "38008377", "Denominacion": "CEIP ADORACIÓN RODRÍGUEZ ALONSO", "Municipio": "GUÍA DE ISORA", "Direccion": "AVENIDA ALTAMAR, S/N", "Telefono": "922-923438", "CorreoElectronico": "38008377@gobiernodecanarias.org" },
+                { "Codigo": "38010554", "Denominacion": "CEIP AGACHE", "Municipio": "GÜÍMAR", "Direccion": "C/ OCTAVIO RODRÍGUEZ DELGADO, 6", "Telefono": "922-760860", "CorreoElectronico": "38010554@gobiernodecanarias.org" },
+                { "Codigo": "38005327", "Denominacion": "CEIP ÁGORA", "Municipio": "SANTA CRUZ DE TENERIFE", "Direccion": "C/ MARRERO TORRES, 2", "Telefono": "922-476963", "CorreoElectronico": "38005327@gobiernodecanarias.org" },
+                { "Codigo": "38010888", "Denominacion": "CEIP AGUAMANSA", "Municipio": "LA OROTAVA", "Direccion": "C/ EL VELO, S/N", "Telefono": "922-479466", "CorreoElectronico": "38010888@gobiernodecanarias.org" },
+                { "Codigo": "38008705", "Denominacion": "CEIP AGUERE", "Municipio": "SAN CRISTÓBAL DE LA LAGUNA", "Direccion": "C/ HENRY DUNNANT. P. ANCHIETA", "Telefono": "922-592260", "CorreoElectronico": "38008705@gobiernodecanarias.org" },
+                { "Codigo": "38004301", "Denominacion": "CEIP AGUSTÍN ESPINOSA", "Municipio": "LOS REALEJOS", "Direccion": "C/ LA UNIÓN, 20", "Telefono": "922-760255", "CorreoElectronico": "38004301@gobiernodecanarias.org" },
+                { "Codigo": "38004773", "Denominacion": "CEIP ALDEA BLANCA", "Municipio": "SAN MIGUEL DE ABONA", "Direccion": "C/ LA ERA, S/N", "Telefono": "922-760539", "CorreoElectronico": "38004773@gobiernodecanarias.org" },
+                { "Codigo": "38005406", "Denominacion": "CEIP ALFONSO SPINOLA", "Municipio": "SANTA CRUZ DE TENERIFE", "Direccion": "BARRANCO TAHODIO, 4. BARRIO DE LA ALEGRIA", "Telefono": "922-478795", "CorreoElectronico": "38005406@gobiernodecanarias.org" },
+                { "Codigo": "38001619", "Denominacion": "CEIP ALFONSO X EL SABIO", "Municipio": "GÜÍMAR", "Direccion": "C/ POETA ARÍSTIDES HDEZ. MORA", "Telefono": "922-760290", "CorreoElectronico": "38001619@gobiernodecanarias.org" },
+                { "Codigo": "38001528", "Denominacion": "CEIP ALMÁCIGO", "Municipio": "GUÍA DE ISORA", "Direccion": "AVDA. LA CONSTITUCIÓN, 6", "Telefono": "922-922070 y 922-922071", "CorreoElectronico": "38001528@gobiernodecanarias.org" },
+                { "Codigo": "38002156", "Denominacion": "CEIP ALONSO NAVA Y GRIMÓN", "Municipio": "SAN CRISTÓBAL DE LA LAGUNA", "Direccion": "C/ DOMINGO GONZÁLEZ PÉREZ, 9", "Telefono": "922-478561", "CorreoElectronico": "38002156@gobiernodecanarias.org" },
+                { "Codigo": "38002193", "Denominacion": "CEIP ÁNGELES BERMEJO", "Municipio": "SAN CRISTÓBAL DE LA LAGUNA", "Direccion": "C/ EL COLEGIO, 31", "Telefono": "922-474956", "CorreoElectronico": "38002193@gobiernodecanarias.org" },
+                { "Codigo": "38004748", "Denominacion": "CEIP ÁNGEL GUIMERÁ", "Municipio": "SAN JUAN DE LA RAMBLA", "Direccion": "C/ OBISPO PÉREZ CÁCERES, 10", "Telefono": "922-360120", "CorreoElectronico": "38004748@gobiernodecanarias.org" },
+                { "Codigo": "38001036", "Denominacion": "CEIP ANTONIO DEL VALLE MENÉNDEZ", "Municipio": "GARACHICO", "Direccion": "EL LAMERO, 1", "Telefono": "922-476908", "CorreoElectronico": "38001036@gobiernodecanarias.org" },
+                { "Codigo": "38009746", "Denominacion": "CEIP APONTE", "Municipio": "GUÍA DE ISORA", "Direccion": "CAMINO DE APONTE, 8", "Telefono": "922-477710", "CorreoElectronico": "38009746@gobiernodecanarias.org" },
+                { "Codigo": "38000792", "Denominacion": "CEIP ARAYA", "Municipio": "CANDELARIA", "Direccion": "C/ SIMÓN HIGUERA, S/N", "Telefono": "922-592605", "CorreoElectronico": "38000792@gobiernodecanarias.org" },
+                { "Codigo": "38006782", "Denominacion": "CEIP AREGUME", "Municipio": "LOS SILOS", "Direccion": "CAMINO EL ESPARRAGAL, 2", "Telefono": "922-474895", "CorreoElectronico": "38006782@gobiernodecanarias.org" },
+                { "Codigo": "38000068", "Denominacion": "CEIP ARMEÑIME", "Municipio": "ADEJE", "Direccion": "C/ LAS ROSAS, S/N", "Telefono": "922-741153", "CorreoElectronico": "38000068@gobiernodecanarias.org" },
+                { "Codigo": "38009941", "Denominacion": "CEIP ATALAYA", "Municipio": "LA MATANZA DE ACENTEJO", "Direccion": "C/ LA CRUZ, S/N", "Telefono": "922-479422", "CorreoElectronico": "38009941@gobiernodecanarias.org" },
+                { "Codigo": "38006514", "Denominacion": "CEIP AURELIO EMILIO ACOSTA FERNÁNDEZ", "Municipio": "SANTIAGO DEL TEIDE", "Direccion": "C/ SAN ISIDRO, 17", "Telefono": "922-592498", "CorreoElectronico": "38006514@gobiernodecanarias.org" },
+                { "Codigo": "38009783", "Denominacion": "CEIP AYATIMAS", "Municipio": "SAN CRISTÓBAL DE LA LAGUNA", "Direccion": "C/ CALVARIO, 46", "Telefono": "922-476975", "CorreoElectronico": "38009783@gobiernodecanarias.org" },
+                { "Codigo": "38007658", "Denominacion": "CEIP BAJOS Y TAGORO", "Municipio": "LA VICTORIA DE ACENTEJO", "Direccion": "C/ LOS BAJOS, 84", "Telefono": "822-171553", "CorreoElectronico": "38007658@gobiernodecanarias.org" },
+                { "Codigo": "38008584", "Denominacion": "CEIP BALDOMERO BETHENCOURT FRANCÉS", "Municipio": "ICOD DE LOS VINOS", "Direccion": "C/ ANTONIO PÉREZ DÍAZ, 20", "Telefono": "922-951227", "CorreoElectronico": "38008584@gobiernodecanarias.org" },
+                { "Codigo": "38012009", "Denominacion": "CEIP BARRANCO DE LAS TORRES", "Municipio": "ADEJE", "Direccion": "C/ BENTINERFE, S/N", "Telefono": "922-782936", "CorreoElectronico": "38012009@gobiernodecanarias.org" },
+                { "Codigo": "38001899", "Denominacion": "CEIP BUEN PASO I", "Municipio": "ICOD DE LOS VINOS", "Direccion": "C/ LA PARDELA, 6", "Telefono": "922-760214", "CorreoElectronico": "38001899@gobiernodecanarias.org" },
+                { "Codigo": "38000378", "Denominacion": "CEIP BUZANADA", "Municipio": "ARONA", "Direccion": "C/ ADOBE, 7", "Telefono": "922-592170", "CorreoElectronico": "38000378@gobiernodecanarias.org" },
+                { "Codigo": "38000408", "Denominacion": "CEIP CABO BLANCO", "Municipio": "ARONA", "Direccion": "C/ ABRIGAÑO, 2", "Telefono": "922-478934", "CorreoElectronico": "38000408@gobiernodecanarias.org" },
+                { "Codigo": "38009539", "Denominacion": "CEIP CAMINO DE LA VILLA", "Municipio": "SAN CRISTÓBAL DE LA LAGUNA", "Direccion": "C/ AIRAM, 2", "Telefono": "922-478778", "CorreoElectronico": "38009539@gobiernodecanarias.org" },
+                { "Codigo": "38009771", "Denominacion": "CEIP CAMINO LARGO", "Municipio": "SAN CRISTÓBAL DE LA LAGUNA", "Direccion": "AVDA. REPÚBLICA ARGENTINA, 1", "Telefono": "922-478783 y 922-478785", "CorreoElectronico": "38009771@gobiernodecanarias.org" },
+                { "Codigo": "38001887", "Denominacion": "CEIP CAMPINO", "Municipio": "ICOD DE LOS VINOS", "Direccion": "C/ EL AMPARO, 41", "Telefono": "922-592285", "CorreoElectronico": "38001887@gobiernodecanarias.org" },
+                { "Codigo": "38009931", "Denominacion": "CEIP CARDONAL I", "Municipio": "SAN CRISTÓBAL DE LA LAGUNA", "Direccion": "AVDA. VALLEHERMOSO, S/N", "Telefono": "922-478770", "CorreoElectronico": "38009931@gobiernodecanarias.org" },
+                { "Codigo": "38000810", "Denominacion": "CEIP CARMEN ÁLVAREZ DE LA ROSA", "Municipio": "CANDELARIA", "Direccion": "C/ LLANO DE LA ROSA, S/N", "Telefono": "922-474903", "CorreoElectronico": "38000810@gobiernodecanarias.org" },
+                { "Codigo": "38003926", "Denominacion": "CEIP CÉSAR MANRIQUE", "Municipio": "PUERTO DE LA CRUZ", "Direccion": "AVDA. BLAS PÉREZ GLEZ. 15", "Telefono": "922-474763", "CorreoElectronico": "38003926@gobiernodecanarias.org" },
+                { "Codigo": "38001267", "Denominacion": "CEIP CHARCO DEL PINO", "Municipio": "GRANADILLA DE ABONA", "Direccion": "C/ CHARCAY, S/N", "Telefono": "922-770359 y 922-770231", "CorreoElectronico": "38001267@gobiernodecanarias.org" },
+                { "Codigo": "38008781", "Denominacion": "CEIP CHAYOFA", "Municipio": "ARONA", "Direccion": "EL RELINCHÓN, S/N", "Telefono": "922-592144", "CorreoElectronico": "38008781@gobiernodecanarias.org" },
+                { "Codigo": "38001498", "Denominacion": "CEIP CHIGORA", "Municipio": "GUÍA DE ISORA", "Direccion": "C/ LA FLORIDA, 22", "Telefono": "922-922026", "CorreoElectronico": "38001498@gobiernodecanarias.org" },
+                { "Codigo": "38001486", "Denominacion": "CEIP CHIGUERGUE", "Municipio": "GUÍA DE ISORA", "Direccion": "C/ CERVANTES, 2", "Telefono": "922-760369", "CorreoElectronico": "38001486@gobiernodecanarias.org" },
+                { "Codigo": "38008122", "Denominacion": "CEIP CHIMISAY", "Municipio": "SANTA CRUZ DE TENERIFE", "Direccion": "C/ DOMINGO SALAZAR CÓLOGAN, S/N", "Telefono": "922-592394", "CorreoElectronico": "38008122@gobiernodecanarias.org" },
+                { "Codigo": "38001516", "Denominacion": "CEIP CHIRCHE", "Municipio": "GUÍA DE ISORA", "Direccion": "LOS CASCAJITOS, 5", "Telefono": "922-592198", "CorreoElectronico": "38001516@gobiernodecanarias.org" },
+                { "Codigo": "38008596", "Denominacion": "CEIP CLORINDA SALAZAR", "Municipio": "SAN CRISTÓBAL DE LA LAGUNA", "Direccion": "AVDA. LAS PALMERAS, S/N", "Telefono": "922-474057", "CorreoElectronico": "38008596@gobiernodecanarias.org" },
+                { "Codigo": "38003537", "Denominacion": "CEIP DOMÍNGUEZ ALFONSO", "Municipio": "LA OROTAVA", "Direccion": "C/ ESCRITOR MESA BENÍTEZ DE LUGO, 4", "Telefono": "922-478792", "CorreoElectronico": "38003537@gobiernodecanarias.org" },
+                { "Codigo": "38011121", "Denominacion": "CEIP EL CHAPATAL", "Municipio": "SANTA CRUZ DE TENERIFE", "Direccion": "C/ UNAMUNO, S/N - EL CHAPATAL", "Telefono": "922-924479", "CorreoElectronico": "38011121@gobiernodecanarias.org" },
+                { "Codigo": "38009485", "Denominacion": "CEIP EL DRAGUILLO", "Municipio": "SANTA CRUZ DE TENERIFE", "Direccion": "C/ MARÍA DE LA PAZ, S/N", "Telefono": "922-760104", "CorreoElectronico": "38009485@gobiernodecanarias.org" },
+                { "Codigo": "38008614", "Denominacion": "CEIP EL FRAILE", "Municipio": "ARONA", "Direccion": "AVDA. ISLAS CANARIAS, S/N", "Telefono": "922-478961", "CorreoElectronico": "38008614@gobiernodecanarias.org" },
+                { "Codigo": "38009965", "Denominacion": "CEIP EL MONTE", "Municipio": "SAN MIGUEL DE ABONA", "Direccion": "C/ BENITO PÉREZ ARMAS, 3", "Telefono": "922-592126", "CorreoElectronico": "38009965@gobiernodecanarias.org" },
+                { "Codigo": "38002387", "Denominacion": "CEIP EL ORTIGAL", "Municipio": "SAN CRISTÓBAL DE LA LAGUNA", "Direccion": "C/ ALFREDO HDEZ., S/N", "Telefono": "922-760391", "CorreoElectronico": "38002387@gobiernodecanarias.org" },
+                { "Codigo": "38001723", "Denominacion": "CEIP EL PUERTITO DE GÜÍMAR", "Municipio": "GÜÍMAR", "Direccion": "C/ HERNÁN CORTÉS, 4", "Telefono": "922-473943", "CorreoElectronico": "38001723@gobiernodecanarias.org" },
+                { "Codigo": "38000354", "Denominacion": "CEIP EL RÍO", "Municipio": "ARICO", "Direccion": "C/ LAS FLORES, S/N", "Telefono": "922-760459", "CorreoElectronico": "38000354@gobiernodecanarias.org" },
+                { "Codigo": "38009059", "Denominacion": "CEIP EL ROQUE", "Municipio": "SAN MIGUEL DE ABONA", "Direccion": "LA CALZADA, 54", "Telefono": "922-592185", "CorreoElectronico": "38009059@gobiernodecanarias.org" },
+                { "Codigo": "38004207", "Denominacion": "CEIP EL TOSCAL-LONGUERA", "Municipio": "LOS REALEJOS", "Direccion": "C/ EL CASTILLO, 44.", "Telefono": "922-760010", "CorreoElectronico": "38004207@gobiernodecanarias.org" },
+                { "Codigo": "38002041", "Denominacion": "CEIP EMETERIO GUTIÉRREZ ALBELO", "Municipio": "ICOD DE LOS VINOS", "Direccion": "C/ ELÍAS SERRA RAFOLS, 4 (EL PAREDÓN)", "Telefono": "922-476415", "CorreoElectronico": "38002041@gobiernodecanarias.org" },
+                { "Codigo": "38006812", "Denominacion": "CEIP EMETERIO GUTIÉRREZ ALBELO-AGUA GARCÍA", "Municipio": "TACORONTE", "Direccion": "AVDA. CECILIO MARRERO, 8", "Telefono": "922-479740", "CorreoElectronico": "38006812@gobiernodecanarias.org" },
+                { "Codigo": "38002119", "Denominacion": "CEIP ENRIQUE GONZÁLEZ MARTÍN", "Municipio": "ICOD DE LOS VINOS", "Direccion": "C/ LA PALMA, 4", "Telefono": "822-171148", "CorreoElectronico": "38002119@gobiernodecanarias.org" },
+                { "Codigo": "38006745", "Denominacion": "CEIP ERJOS", "Municipio": "LOS SILOS", "Direccion": "C/ ROQUILLO, S/N", "Telefono": "922-478515", "CorreoElectronico": "38006745@gobiernodecanarias.org" },
+                { "Codigo": "38006915", "Denominacion": "CEIP ERNESTO CASTRO FARIÑA", "Municipio": "TACORONTE", "Direccion": "CTRA. GENERAL DEL NORTE, 289-EL TORREÓN", "Telefono": "922-477230", "CorreoElectronico": "38006915@gobiernodecanarias.org" },
+                { "Codigo": "38000081", "Denominacion": "CEIP FAÑABÉ", "Municipio": "ADEJE", "Direccion": "C/ LA GOMERA, 192", "Telefono": "922-716001", "CorreoElectronico": "38000081@gobiernodecanarias.org" },
+                { "Codigo": "38006551", "Denominacion": "CEIP FELICIANO HERNÁNDEZ GARCÍA", "Municipio": "SANTIAGO DEL TEIDE", "Direccion": "AVDA. DE LA IGLESIA, 2A", "Telefono": "922-478509", "CorreoElectronico": "38006551@gobiernodecanarias.org" },
+                { "Codigo": "38008331", "Denominacion": "CEIP FERNANDO III EL SANTO", "Municipio": "SAN CRISTÓBAL DE LA LAGUNA", "Direccion": "C/ MARÍA ROSA ALONSO, S/N", "Telefono": "922-649953", "CorreoElectronico": "38008331@gobiernodecanarias.org" },
+                { "Codigo": "38007117", "Denominacion": "CEIP FRANCISCA SANTOS MELIÁN", "Municipio": "TEGUESTE", "Direccion": "CTRA. GENERAL, 214", "Telefono": "922-474919", "CorreoElectronico": "38007117@gobiernodecanarias.org" },
+                { "Codigo": "38004694", "Denominacion": "CEIP FRANCISCO AFONSO CARRILLO", "Municipio": "SAN JUAN DE LA RAMBLA", "Direccion": "JOSÉ GREGORIO YANES DORTA, 2", "Telefono": "922-592407", "CorreoElectronico": "38004694@gobiernodecanarias.org" },
+                { "Codigo": "38001361", "Denominacion": "CEIP FROILÁN HERNÁNDEZ GONZÁLEZ", "Municipio": "GRANADILLA DE ABONA", "Direccion": "C/ VELÁZQUEZ, S/N", "Telefono": "922-478700", "CorreoElectronico": "38001361@gobiernodecanarias.org" },
+                { "Codigo": "38008808", "Denominacion": "CEIP GENOVÉS", "Municipio": "GARACHICO", "Direccion": "BARRIO GENOVÉS", "Telefono": "922-478505", "CorreoElectronico": "38008808@gobiernodecanarias.org" },
+                { "Codigo": "38008742", "Denominacion": "CEIP GEORGIA MARTÍN HERNÁNDEZ", "Municipio": "SANTA CRUZ DE TENERIFE", "Direccion": "AVDA. JOSÉ VÍCTOR DOMÍNGUEZ, 36", "Telefono": "922-477985 y 922-477984", "CorreoElectronico": "38008742@gobiernodecanarias.org" },
+                { "Codigo": "38016684", "Denominacion": "CEIP GESTA 25 DE JULIO", "Municipio": "SANTA CRUZ DE TENERIFE", "Direccion": "C/ GUÍA DE ISORA, 38", "Telefono": "922-221661", "CorreoElectronico": "38016684@gobiernodecanarias.org" },
+                { "Codigo": "38007932", "Denominacion": "CEIP GRANADILLA DE ABONA", "Municipio": "GRANADILLA DE ABONA", "Direccion": "CTRA. SAN MIGUEL, S/N", "Telefono": "922-478834", "CorreoElectronico": "38007932@gobiernodecanarias.org" },
+                { "Codigo": "38009515", "Denominacion": "CEIP GUAYONGE", "Municipio": "TACORONTE", "Direccion": "C/ LOMO LA VIEJA, S/N", "Telefono": "922-474915", "CorreoElectronico": "38009515@gobiernodecanarias.org" },
+                { "Codigo": "38000858", "Denominacion": "CEIP IGUESTE", "Municipio": "CANDELARIA", "Direccion": "C/ CURVA JUAN PESTANO, S/N", "Telefono": "922-479308", "CorreoElectronico": "38000858@gobiernodecanarias.org" },
+                { "Codigo": "38009795", "Denominacion": "CEIP INFANTA ELENA", "Municipio": "LA OROTAVA", "Direccion": "CTRA. GENERAL, S/N", "Telefono": "922-922754", "CorreoElectronico": "38009795@gobiernodecanarias.org" },
+                { "Codigo": "38003719", "Denominacion": "CEIP INOCENCIO SOSA HERNÁNDEZ", "Municipio": "LA OROTAVA", "Direccion": "C/ ANICETO DE LEÓN ALVARADO, S/N", "Telefono": "922-592265", "CorreoElectronico": "38003719@gobiernodecanarias.org" },
+                { "Codigo": "38015680", "Denominacion": "CEIP ISAAC DE VEGA", "Municipio": "GRANADILLA DE ABONA", "Direccion": "C/ LAS ACACIAS, 7", "Telefono": "922-478941", "CorreoElectronico": "38015680@gobiernodecanarias.org" },
+                { "Codigo": "38005704", "Denominacion": "CEIP ISABEL LA CATÓLICA", "Municipio": "SANTA CRUZ DE TENERIFE", "Direccion": "C/ JOSÉ HDEZ. AFONSO, 36", "Telefono": "922-592626", "CorreoElectronico": "38005704@gobiernodecanarias.org" },
+                { "Codigo": "38006538", "Denominacion": "CEIP JOSÉ ESQUIVEL", "Municipio": "SANTIAGO DEL TEIDE", "Direccion": "C/ EL LAJIAL, 3", "Telefono": "922-478932", "CorreoElectronico": "38006538@gobiernodecanarias.org" },
+                { "Codigo": "38005157", "Denominacion": "CEIP JOSÉ PÉREZ RODRÍGUEZ", "Municipio": "SANTA CRUZ DE TENERIFE", "Direccion": "C/ LOS BANQUITOS, 26", "Telefono": "922-474101", "CorreoElectronico": "38005157@gobiernodecanarias.org" },
+                { "Codigo": "38004840", "Denominacion": "CEIP JUAN BETHENCOURT ALFONSO", "Municipio": "SAN MIGUEL DE ABONA", "Direccion": "CTRA. GENERAL A LOS ABRIGOS, S/N", "Telefono": "922-760986", "CorreoElectronico": "38004840@gobiernodecanarias.org" },
+                { "Codigo": "38004013", "Denominacion": "CEIP JUAN CRUZ RUIZ", "Municipio": "PUERTO DE LA CRUZ", "Direccion": "C/ CARRIL, 63", "Telefono": "922-478841", "CorreoElectronico": "38004013@gobiernodecanarias.org" },
+                { "Codigo": "38001395", "Denominacion": "CEIP JUAN GARCÍA PÉREZ", "Municipio": "GRANADILLA DE ABONA", "Direccion": "C/ JUAN XXIII, S/N", "Telefono": "922-391313 y 922-391583", "CorreoElectronico": "38001395@gobiernodecanarias.org" },
+                { "Codigo": "38006381", "Denominacion": "CEIP JULIÁN ROJAS DE VERA", "Municipio": "SANTA CRUZ DE TENERIFE", "Direccion": "C/ LA MONTAÑETA, 13", "Telefono": "922-760260", "CorreoElectronico": "38006381@gobiernodecanarias.org" },
+                { "Codigo": "38008043", "Denominacion": "CEIP JULIÁN ZAFRA MORENO", "Municipio": "GÜÍMAR", "Direccion": "C/ HONDURAS, 7", "Telefono": "922-511410", "CorreoElectronico": "38008043@gobiernodecanarias.org" },
+                { "Codigo": "38010441", "Denominacion": "CEIP JULIO CASTILLO TORROBA", "Municipio": "SANTA CRUZ DE TENERIFE", "Direccion": "C/ CASTAÑO, S/N", "Telefono": "922-478727 y 922-478726", "CorreoElectronico": "38010441@gobiernodecanarias.org" },
+                { "Codigo": "38001930", "Denominacion": "CEIP JULIO DELGADO DELGADO", "Municipio": "ICOD DE LOS VINOS", "Direccion": "C/ FRAY CRISTÓBAL ORAMAS, 3", "Telefono": "922-476546 y 922-477604", "CorreoElectronico": "38001930@gobiernodecanarias.org" },
+                { "Codigo": "38006401", "Denominacion": "CEIP LA CORUJERA", "Municipio": "SANTA ÚRSULA", "Direccion": "CTRA. NUEVA LA CORUJERA, 44", "Telefono": "922-476962", "CorreoElectronico": "38006401@gobiernodecanarias.org" },
+                { "Codigo": "38010396", "Denominacion": "CEIP LA CUESTA", "Municipio": "BUENAVISTA DEL NORTE", "Direccion": "CTRA. DE EL PALMAR", "Telefono": "922-478514", "CorreoElectronico": "38010396@gobiernodecanarias.org" },
+                { "Codigo": "38001474", "Denominacion": "CEIP LA CUMBRITA", "Municipio": "GUÍA DE ISORA", "Direccion": "C/ LA CUMBRITA, 23", "Telefono": "922-592308", "CorreoElectronico": "38001474@gobiernodecanarias.org" },
+                { "Codigo": "38009451", "Denominacion": "CEIP LA ERA", "Municipio": "GUÍA DE ISORA", "Direccion": "C/ LA ERA, 1", "Telefono": "922-850027", "CorreoElectronico": "38009451@gobiernodecanarias.org" },
+                { "Codigo": "38007762", "Denominacion": "CEIP LA ESCALONA", "Municipio": "VILAFLOR DE CHASNA", "Direccion": "CTRA. GENERAL, S/N", "Telefono": "922-760406", "CorreoElectronico": "38007762@gobiernodecanarias.org" },
+                { "Codigo": "38011765", "Denominacion": "CEIP LA ESTRELLA", "Municipio": "ARONA", "Direccion": "C/ COMPOS Nº 6", "Telefono": "922-474078", "CorreoElectronico": "38011765@gobiernodecanarias.org" },
+                { "Codigo": "38015436", "Denominacion": "CEIP LA JURADA", "Municipio": "GRANADILLA DE ABONA", "Direccion": "C/ LA CONSTITUCIÓN, 9", "Telefono": "622-225170", "CorreoElectronico": "38015436@gobiernodecanarias.org" },
+                { "Codigo": "38003495", "Denominacion": "CEIP LA LUZ", "Municipio": "LA OROTAVA", "Direccion": "CTRA. GENERAL LA LUZ, S/N", "Telefono": "922-478229", "CorreoElectronico": "38003495@gobiernodecanarias.org" },
+                { "Codigo": "38002090", "Denominacion": "CEIP LA MANCHA", "Municipio": "ICOD DE LOS VINOS", "Direccion": "C/ LA YEDRA, 5", "Telefono": "922-592180", "CorreoElectronico": "38002090@gobiernodecanarias.org" },
+                { "Codigo": "38001590", "Denominacion": "CEIP LA MONTAÑA", "Municipio": "GUÍA DE ISORA", "Direccion": "C/ LA MILAGROSA, 28", "Telefono": "822-171620", "CorreoElectronico": "38001590@gobiernodecanarias.org" },
+                { "Codigo": "38004232", "Denominacion": "CEIP LA MONTAÑETA", "Municipio": "LOS REALEJOS", "Direccion": "C/ LA CARTAYA, S/N", "Telefono": "922-476993", "CorreoElectronico": "38004232@gobiernodecanarias.org" },
+                { "Codigo": "38010657", "Denominacion": "CEIP LA PASADA", "Municipio": "GRANADILLA DE ABONA", "Direccion": "C/ LA PASADA, S/N (LA PASADA)", "Telefono": "922-474165 y 922-474168", "CorreoElectronico": "38010657@gobiernodecanarias.org" },
+                { "Codigo": "38005731", "Denominacion": "CEIP LA ROSA", "Municipio": "SANTA CRUZ DE TENERIFE", "Direccion": "C/ LA ROSA, 39", "Telefono": "922-476876", "CorreoElectronico": "38005731@gobiernodecanarias.org" },
+                { "Codigo": "38016532", "Denominacion": "CEIP LA SALUD", "Municipio": "SANTA CRUZ DE TENERIFE", "Direccion": "CALLE SAN JUAN DE LA RAMBLA, S/N,", "Telefono": "922-882076", "CorreoElectronico": "38016532@gobiernodecanarias.org" },
+                { "Codigo": "38009461", "Denominacion": "CEIP LAS CARBONERAS", "Municipio": "SAN CRISTÓBAL DE LA LAGUNA", "Direccion": "LAS CARBONERAS", "Telefono": "922-474708", "CorreoElectronico": "38009461@gobiernodecanarias.org" },
+                { "Codigo": "38008471", "Denominacion": "CEIP LAS CHUMBERAS", "Municipio": "SAN CRISTÓBAL DE LA LAGUNA", "Direccion": "C/ FERNANDO DÍAZ CUTILLAS", "Telefono": "922-592346", "CorreoElectronico": "38008471@gobiernodecanarias.org" },
+                { "Codigo": "38005509", "Denominacion": "CEIP LAS DELICIAS", "Municipio": "SANTA CRUZ DE TENERIFE", "Direccion": "C/ PEDRO DOBLADO CLAVERÍE, 1", "Telefono": "922-478755", "CorreoElectronico": "38005509@gobiernodecanarias.org" },
+                { "Codigo": "38008109", "Denominacion": "CEIP LAS MANTECAS", "Municipio": "SAN CRISTÓBAL DE LA LAGUNA", "Direccion": "CAMINO LAS MANTECAS, 62", "Telefono": "922-592411", "CorreoElectronico": "38008109@gobiernodecanarias.org" },
+                { "Codigo": "38002341", "Denominacion": "CEIP LAS MERCEDES", "Municipio": "SAN CRISTÓBAL DE LA LAGUNA", "Direccion": "C/ VISTALMÓN, 14", "Telefono": "922-592188", "CorreoElectronico": "38002341@gobiernodecanarias.org" },
+                { "Codigo": "38009497", "Denominacion": "CEIP LAS RETAMAS", "Municipio": "SANTA CRUZ DE TENERIFE", "Direccion": "URB. LAS RETAMAS, S/N", "Telefono": "922-592326", "CorreoElectronico": "38009497@gobiernodecanarias.org" },
+                { "Codigo": "38010256", "Denominacion": "CEIP LAS SALINAS", "Municipio": "LOS SILOS", "Direccion": "PASEO MARÍTIMO, S/N", "Telefono": "922-478517", "CorreoElectronico": "38010256@gobiernodecanarias.org" },
+                { "Codigo": "38010244", "Denominacion": "CEIP LA VEGA", "Municipio": "ICOD DE LOS VINOS", "Direccion": "LA VEGA", "Telefono": "922-922031", "CorreoElectronico": "38010244@gobiernodecanarias.org" },
+                { "Codigo": "38002478", "Denominacion": "CEIP LA VERDELLADA", "Municipio": "SAN CRISTÓBAL DE LA LAGUNA", "Direccion": "C/ EMILIO GUTIÉRREZ SALAZAR, S/N", "Telefono": "922-250017", "CorreoElectronico": "38002478@gobiernodecanarias.org" },
+                { "Codigo": "38003483", "Denominacion": "CEIP LEONCIO ESTÉVEZ LUIS", "Municipio": "LA OROTAVA", "Direccion": "C/ LA PALMA, 1 ( LA FLORIDA)", "Telefono": "922-592189", "CorreoElectronico": "38003483@gobiernodecanarias.org" },
+                { "Codigo": "38002120", "Denominacion": "CEIP LLANITO PERERA", "Municipio": "ICOD DE LOS VINOS", "Direccion": "C/ LLANITO PERERA, 39", "Telefono": "922-478516 y 922-478527", "CorreoElectronico": "38002120@gobiernodecanarias.org" },
+                { "Codigo": "38015461", "Denominacion": "CEIP LLANO DE LAS NACIONES", "Municipio": "SAN MIGUEL DE ABONA", "Direccion": "C/ MENCEY ANAGA S/N - LLANO DEL CAMELLO", "Telefono": "922-592182", "CorreoElectronico": "38015461@gobiernodecanarias.org" },
+                { "Codigo": "38003112", "Denominacion": "CEIP LOPE DE GUERRA", "Municipio": "SAN CRISTÓBAL DE LA LAGUNA", "Direccion": "CTRA. GENERAL, 71", "Telefono": "922-478416", "CorreoElectronico": "38003112@gobiernodecanarias.org" },
+                { "Codigo": "38008146", "Denominacion": "CEIP LOS ABRIGOS", "Municipio": "GRANADILLA DE ABONA", "Direccion": "C/ LA LAPA, S/N", "Telefono": "922-478565", "CorreoElectronico": "38008146@gobiernodecanarias.org" },
+                { "Codigo": "38010751", "Denominacion": "CEIP LOS ANDENES DE TACO", "Municipio": "SAN CRISTÓBAL DE LA LAGUNA", "Direccion": "AVDA. SAN MARTÍN DE PORRES, 2", "Telefono": "922-924988", "CorreoElectronico": "38010751@gobiernodecanarias.org" },
+                { "Codigo": "38001231", "Denominacion": "CEIP LOS BLANQUITOS", "Municipio": "GRANADILLA DE ABONA", "Direccion": "CTRA. GENERAL", "Telefono": "922-922062", "CorreoElectronico": "38001231@gobiernodecanarias.org" },
+                { "Codigo": "38007981", "Denominacion": "CEIP LOS CAMPITOS", "Municipio": "SANTA CRUZ DE TENERIFE", "Direccion": "CTRA. GENERAL DE LOS CAMPITOS, S/N", "Telefono": "922-592129", "CorreoElectronico": "38007981@gobiernodecanarias.org" },
+                { "Codigo": "38010645", "Denominacion": "CEIP LOS CRISTIANOS", "Municipio": "ARONA", "Direccion": "C/ PIZCA, 2", "Telefono": "922-474172", "CorreoElectronico": "38010645@gobiernodecanarias.org" },
+                { "Codigo": "38009217", "Denominacion": "CEIP LOS DRAGOS", "Municipio": "SANTA CRUZ DE TENERIFE", "Direccion": "C/ JUAN RAMÓN JIMÉNEZ, 14", "Telefono": "922-592344", "CorreoElectronico": "38009217@gobiernodecanarias.org" },
+                { "Codigo": "38011558", "Denominacion": "CEIP LOS MENCEYES", "Municipio": "SANTA CRUZ DE TENERIFE", "Direccion": "C/ CUPRESO, S/N . URB. AÑAZA", "Telefono": "922-474711", "CorreoElectronico": "38011558@gobiernodecanarias.org" },
+                { "Codigo": "38009141", "Denominacion": "CEIP LOS OLIVOS", "Municipio": "ADEJE", "Direccion": "C/ LOS OLIVOS, S/N", "Telefono": "922-710805", "CorreoElectronico": "38009141@gobiernodecanarias.org" },
+                { "Codigo": "38008948", "Denominacion": "CEIP LOS VERODES", "Municipio": "SANTA CRUZ DE TENERIFE", "Direccion": "C/ ALCALDE GARCÍA RAMOS, 4 A", "Telefono": "922-592297", "CorreoElectronico": "38008948@gobiernodecanarias.org" },
+                { "Codigo": "38010475", "Denominacion": "CEIP LUIS ÁLVAREZ CRUZ", "Municipio": "ARONA", "Direccion": "AVDA. PRÍNCIPE FELIPE, 24 - LAS GALLETAS", "Telefono": "922-477920", "CorreoElectronico": "38010475@gobiernodecanarias.org" },
+                { "Codigo": "38009357", "Denominacion": "CEIP MACHADO", "Municipio": "EL ROSARIO", "Direccion": "C/ LA FUENTECILLA, 26", "Telefono": "922-922055", "CorreoElectronico": "38009357@gobiernodecanarias.org" },
+                { "Codigo": "38011005", "Denominacion": "CEIP MARÍA DEL CARMEN FERNÁNDEZ MELIÁN", "Municipio": "TEGUESTE", "Direccion": "C/ LOS SABANDEÑOS, 8", "Telefono": "922-478465 y 922-478466", "CorreoElectronico": "38011005@gobiernodecanarias.org" },
+                { "Codigo": "38006289", "Denominacion": "CEIP MARÍA ISABEL SARMIENTO", "Municipio": "SANTA CRUZ DE TENERIFE", "Direccion": "AVDA. NTRA. SRA. DEL CARMEN, 3", "Telefono": "822-171570", "CorreoElectronico": "38006289@gobiernodecanarias.org" },
+                { "Codigo": "38006964", "Denominacion": "CEIP MARÍA ROSA ALONSO", "Municipio": "TACORONTE", "Direccion": "C/ PÉREZ REYES, 37", "Telefono": "922-477677", "CorreoElectronico": "38006964@gobiernodecanarias.org" },
+                { "Codigo": "38004438", "Denominacion": "CEIP MATÍAS LLABRÉS VERDÚN", "Municipio": "SANTA CRUZ DE TENERIFE", "Direccion": "C/ EL CONVENTO, 23", "Telefono": "922-476999", "CorreoElectronico": "38004438@gobiernodecanarias.org" },
+                { "Codigo": "38009606", "Denominacion": "CEIP MAXIMILIANO GIL MELIÁN", "Municipio": "TACORONTE", "Direccion": "CALLEJÓN DE GÓMEZ, 16", "Telefono": "922-747423", "CorreoElectronico": "38009606@gobiernodecanarias.org" },
+                { "Codigo": "38007099", "Denominacion": "CEIP MELCHOR NÚÑEZ TEJERA", "Municipio": "TEGUESTE", "Direccion": "CAMINO DEL MONTE, 8", "Telefono": "922-922040 y 922-478510", "CorreoElectronico": "38007099@gobiernodecanarias.org" },
+                { "Codigo": "38009825", "Denominacion": "CEIP MENCEY BENCOMO", "Municipio": "SANTA ÚRSULA", "Direccion": "CTRA. LA CORUJERA, 11", "Telefono": "922-476860", "CorreoElectronico": "38009825@gobiernodecanarias.org" },
+                { "Codigo": "38008110", "Denominacion": "CEIP MENCEY BENTOR", "Municipio": "LOS REALEJOS", "Direccion": "C/ EL NATERO, 1", "Telefono": "922-924477", "CorreoElectronico": "38008110@gobiernodecanarias.org" },
+                { "Codigo": "38007026", "Denominacion": "CEIP MIGUEL DE CERVANTES", "Municipio": "EL TANQUE", "Direccion": "C/ MIGUEL DE CERVANTES, 2 (CRUZ GRANDE)", "Telefono": "922-760022", "CorreoElectronico": "38007026@gobiernodecanarias.org" },
+                { "Codigo": "38005376", "Denominacion": "CEIP MIGUEL PINTOR GONZÁLEZ", "Municipio": "SANTA CRUZ DE TENERIFE", "Direccion": "AVDA. JOSÉ MARTÍ, 12", "Telefono": "922-592325", "CorreoElectronico": "38005376@gobiernodecanarias.org" },
+                { "Codigo": "38008699", "Denominacion": "CEIP MONTAÑA PACHO", "Municipio": "SAN CRISTÓBAL DE LA LAGUNA", "Direccion": "C/ SANTA ELENA CHIMISAY, S/N", "Telefono": "922-476958", "CorreoElectronico": "38008699@gobiernodecanarias.org" },
+                { "Codigo": "38015643", "Denominacion": "CEIP MONTAÑA PELADA", "Municipio": "GRANADILLA DE ABONA", "Direccion": "AVDA. MAR ADRIÁTICO, S/N", "Telefono": "922-592610 y 922-592611", "CorreoElectronico": "38015643@gobiernodecanarias.org" },
+                { "Codigo": "38010402", "Denominacion": "CEIP MONTAÑA ROJA", "Municipio": "GRANADILLA DE ABONA", "Direccion": "C/ MENCEY DE ABONA, 4", "Telefono": "922-592658 y 922-592659", "CorreoElectronico": "38010402@gobiernodecanarias.org" },
+                { "Codigo": "38009761", "Denominacion": "CEIP NARCISO BRITO", "Municipio": "SAN CRISTÓBAL DE LA LAGUNA", "Direccion": "C/ ANATAEL CABRERA. BARRIO OBISPADO", "Telefono": "922-478366", "CorreoElectronico": "38009761@gobiernodecanarias.org" },
+                { "Codigo": "38000731", "Denominacion": "CEIP NICOLÁS DÍAZ DORTA", "Municipio": "BUENAVISTA DEL NORTE", "Direccion": "AVDA. NICOLÁS DÍAZ DORTA, 2", "Telefono": "922-592390", "CorreoElectronico": "38000731@gobiernodecanarias.org" },
+                { "Codigo": "38003513", "Denominacion": "CEIP NUESTRA SEÑORA DE LA CONCEPCIÓN", "Municipio": "LA OROTAVA", "Direccion": "C/ MAGISTRADO BARREDA, 2", "Telefono": "922-477793", "CorreoElectronico": "38003513@gobiernodecanarias.org" },
+                { "Codigo": "38000299", "Denominacion": "CEIP NUESTRA SEÑORA DE LA LUZ", "Municipio": "ARICO", "Direccion": "LA DEGOLLADA, 17", "Telefono": "922-478790", "CorreoElectronico": "38000299@gobiernodecanarias.org" },
+                { "Codigo": "38001243", "Denominacion": "CEIP NUESTRA SEÑORA DEL BUEN VIAJE", "Municipio": "GRANADILLA DE ABONA", "Direccion": "C/ BUEN VIAJE, S/N", "Telefono": "922-922003", "CorreoElectronico": "38001243@gobiernodecanarias.org" },
+                { "Codigo": "38000366", "Denominacion": "CEIP ÓSCAR DOMÍNGUEZ", "Municipio": "ARONA", "Direccion": "C/ CALVARIO, 12", "Telefono": "922-924584", "CorreoElectronico": "38000366@gobiernodecanarias.org" },
+                { "Codigo": "38007041", "Denominacion": "CEIP PABLO DÍAZ MARTÍN", "Municipio": "EL TANQUE", "Direccion": "AVDA. DE ORIENTE, S/N", "Telefono": "922-478506", "CorreoElectronico": "38007041@gobiernodecanarias.org" },
+                { "Codigo": "38004244", "Denominacion": "CEIP PALO BLANCO", "Municipio": "LOS REALEJOS", "Direccion": "C/ EL COLEGIO, S/N", "Telefono": "922-476533", "CorreoElectronico": "38004244@gobiernodecanarias.org" },
+                { "Codigo": "38015400", "Denominacion": "CEIP PARQUE LA REINA", "Municipio": "ARONA", "Direccion": "C/ INFANTA CRISTINA, 5 - CHO II", "Telefono": "922-592402 y 922-592403", "CorreoElectronico": "38015400@gobiernodecanarias.org" },
+                { "Codigo": "38000421", "Denominacion": "CEIP PÉREZ VALERO", "Municipio": "ARONA", "Direccion": "C/ LOS SABANDEÑOS Nº 4", "Telefono": "922-478582", "CorreoElectronico": "38000421@gobiernodecanarias.org" },
+                { "Codigo": "38004256", "Denominacion": "CEIP PÉREZ ZAMORA", "Municipio": "LOS REALEJOS", "Direccion": "AVDA. SANTIAGO APÓSTOL, 3", "Telefono": "922-592499", "CorreoElectronico": "38004256@gobiernodecanarias.org" },
+                { "Codigo": "38010384", "Denominacion": "CEIP PLAYA LAS AMÉRICAS", "Municipio": "ARONA", "Direccion": "C/ ARQUITECTO GÓMEZ CUESTA Nº21", "Telefono": "922-477785", "CorreoElectronico": "38010384@gobiernodecanarias.org" },
+                { "Codigo": "38001437", "Denominacion": "CEIP PLUS ULTRA", "Municipio": "LA GUANCHA", "Direccion": "AVDA. HIPÓLITO SINFORIANO, S/N", "Telefono": "922-760270", "CorreoElectronico": "38001437@gobiernodecanarias.org" },
+                { "Codigo": "38002508", "Denominacion": "CEIP PRÁCTICAS ANEJA E.U.P.", "Municipio": "SAN CRISTÓBAL DE LA LAGUNA", "Direccion": "C/ HERACLIO SÁNCHEZ, 37", "Telefono": "922-478756", "CorreoElectronico": "38002508@gobiernodecanarias.org" },
+                { "Codigo": "38008547", "Denominacion": "CEIP PRINCESA TEJINA", "Municipio": "SAN CRISTÓBAL DE LA LAGUNA", "Direccion": "AVDA. DE MILÁN, 56", "Telefono": "922-951325", "CorreoElectronico": "38008547@gobiernodecanarias.org" },
+                { "Codigo": "38000834", "Denominacion": "CEIP PRÍNCIPE FELIPE", "Municipio": "CANDELARIA", "Direccion": "C/ SANTA ANA, 21", "Telefono": "922-478935", "CorreoElectronico": "38000834@gobiernodecanarias.org" },
+                { "Codigo": "38004001", "Denominacion": "CEIP PUNTA BRAVA", "Municipio": "PUERTO DE LA CRUZ", "Direccion": "C/ LAS ADELFAS, S/N", "Telefono": "922-951943", "CorreoElectronico": "38004001@gobiernodecanarias.org" },
+                { "Codigo": "38002417", "Denominacion": "CEIP PUNTA DEL HIDALGO", "Municipio": "SAN CRISTÓBAL DE LA LAGUNA", "Direccion": "CTRA. GRAL. PUNTA DEL HIDALGO, 106", "Telefono": "922-592163", "CorreoElectronico": "38002417@gobiernodecanarias.org" },
+                { "Codigo": "38010876", "Denominacion": "CEIP PUNTA LARGA", "Municipio": "CANDELARIA", "Direccion": "C/ BATAYOLA, S/N", "Telefono": "922-478840", "CorreoElectronico": "38010876@gobiernodecanarias.org" },
+                { "Codigo": "38005169", "Denominacion": "CEIP RAFAEL GAVIÑO DEL BOSQUE", "Municipio": "SANTA CRUZ DE TENERIFE", "Direccion": "C/ SAN JUAN, 32", "Telefono": "822-171617 y 922-596307", "CorreoElectronico": "38005169@gobiernodecanarias.org" },
+                { "Codigo": "38005716", "Denominacion": "CEIP RAMBLA DE SANTA CRUZ", "Municipio": "SANTA CRUZ DE TENERIFE", "Direccion": "RAMBLA DE SANTA CRUZ, 140", "Telefono": "922-474946", "CorreoElectronico": "38005716@gobiernodecanarias.org" },
+                { "Codigo": "38003562", "Denominacion": "CEIP RAMÓN Y CAJAL", "Municipio": "LA OROTAVA", "Direccion": "C/ GARABOTO, 12", "Telefono": "922-951130", "CorreoElectronico": "38003562@gobiernodecanarias.org" },
+                { "Codigo": "38006678", "Denominacion": "CEIP RAVELO", "Municipio": "EL SAUZAL", "Direccion": "C/ SAN CRISTÓBAL, 54", "Telefono": "922-592143", "CorreoElectronico": "38006678@gobiernodecanarias.org" },
+                { "Codigo": "38005674", "Denominacion": "CEIP SALAMANCA", "Municipio": "SANTA CRUZ DE TENERIFE", "Direccion": "C/ FEBLES CAMPOS, 36", "Telefono": "922-270147", "CorreoElectronico": "38005674@gobiernodecanarias.org" },
+                { "Codigo": "38006681", "Denominacion": "CEIP SAMOGA", "Municipio": "EL SAUZAL", "Direccion": "RONDA DEL SAUZALITO, 38", "Telefono": "922-478963", "CorreoElectronico": "38006681@gobiernodecanarias.org" },
+                { "Codigo": "38003501", "Denominacion": "CEIP SAN AGUSTÍN", "Municipio": "LA OROTAVA", "Direccion": "AVDA. COMUNIDAD IBEROAMERICANA, 5 A", "Telefono": "922-474710", "CorreoElectronico": "38003501@gobiernodecanarias.org" },
+                { "Codigo": "38005133", "Denominacion": "CEIP SAN ANDRÉS", "Municipio": "SANTA CRUZ DE TENERIFE", "Direccion": "RAFAEL FOLCH YOU, 3", "Telefono": "922-760121", "CorreoElectronico": "38005133@gobiernodecanarias.org" },
+                { "Codigo": "38009801", "Denominacion": "CEIP SAN ANTONIO", "Municipio": "PUERTO DE LA CRUZ", "Direccion": "C/ SAN RAFAEL, 2", "Telefono": "922-477721", "CorreoElectronico": "38009801@gobiernodecanarias.org" },
+                { "Codigo": "38003045", "Denominacion": "CEIP SAN BARTOLOMÉ", "Municipio": "SAN CRISTÓBAL DE LA LAGUNA", "Direccion": "C/ HURONCILLO, 15", "Telefono": "822-171622", "CorreoElectronico": "38003045@gobiernodecanarias.org" },
+                { "Codigo": "38002481", "Denominacion": "CEIP SAN BENITO", "Municipio": "SAN CRISTÓBAL DE LA LAGUNA", "Direccion": "C/ SABINO BERTHELOT, S/N", "Telefono": "922-760829", "CorreoElectronico": "38002481@gobiernodecanarias.org" },
+                { "Codigo": "38006769", "Denominacion": "CEIP SAN BERNARDO", "Municipio": "LOS SILOS", "Direccion": "CAMINO EL TOSTADO, S/N", "Telefono": "922-478789", "CorreoElectronico": "38006769@gobiernodecanarias.org" },
+                { "Codigo": "38005686", "Denominacion": "CEIP SAN FERNANDO", "Municipio": "SANTA CRUZ DE TENERIFE", "Direccion": "C/ RAMÓN Y CAJAL, 45", "Telefono": "922-760218", "CorreoElectronico": "38005686@gobiernodecanarias.org" },
+                { "Codigo": "38006472", "Denominacion": "CEIP SAN FERNANDO", "Municipio": "SANTA ÚRSULA", "Direccion": "C/ CAMINO PASTOR, 28", "Telefono": "922-477630", "CorreoElectronico": "38006472@gobiernodecanarias.org" },
+                { "Codigo": "38004441", "Denominacion": "CEIP SAN ISIDRO", "Municipio": "EL ROSARIO", "Direccion": "PLAZA DE LA IGLESIA, S/N", "Telefono": "922-478810", "CorreoElectronico": "38004441@gobiernodecanarias.org" },
+                { "Codigo": "38008079", "Denominacion": "CEIP SAN JOSÉ", "Municipio": "LOS SILOS", "Direccion": "AVDA. EL PUERTITO, 65", "Telefono": "922-477758", "CorreoElectronico": "38008079@gobiernodecanarias.org" },
+                { "Codigo": "38006952", "Denominacion": "CEIP SAN JUAN PERALES", "Municipio": "TACORONTE", "Direccion": "C/ HNOS. LÓPEZ, 4", "Telefono": "922-760868", "CorreoElectronico": "38006952@gobiernodecanarias.org" },
+                { "Codigo": "38002880", "Denominacion": "CEIP SAN LUIS GONZAGA", "Municipio": "SAN CRISTÓBAL DE LA LAGUNA", "Direccion": "CAMINO VIEJO DE CANDELARIA, 3", "Telefono": "922-476910", "CorreoElectronico": "38002880@gobiernodecanarias.org" },
+                { "Codigo": "38008626", "Denominacion": "CEIP SAN MATÍAS", "Municipio": "SAN CRISTÓBAL DE LA LAGUNA", "Direccion": "C/ SAN ELÍAS, S/N", "Telefono": "922-474081", "CorreoElectronico": "38008626@gobiernodecanarias.org" },
+                { "Codigo": "38004293", "Denominacion": "CEIP SAN SEBASTIÁN", "Municipio": "LOS REALEJOS", "Direccion": "C/LA ACEQUIA S/N. REALEJO BAJO.", "Telefono": "922-924472", "CorreoElectronico": "38004293@gobiernodecanarias.org" },
+                { "Codigo": "38004487", "Denominacion": "CEIP SANTA CRUZ DE CALIFORNIA", "Municipio": "SANTA CRUZ DE TENERIFE", "Direccion": "C/ GANSO, 2", "Telefono": "922-760243", "CorreoElectronico": "38004487@gobiernodecanarias.org" },
+                { "Codigo": "38004451", "Denominacion": "CEIP SANTA MARÍA DEL MAR", "Municipio": "SANTA CRUZ DE TENERIFE", "Direccion": "C/ ATAMÁN, 24", "Telefono": "922-478716", "CorreoElectronico": "38004451@gobiernodecanarias.org" },
+                { "Codigo": "38002326", "Denominacion": "CEIP SANTA ROSA DE LIMA", "Municipio": "SAN CRISTÓBAL DE LA LAGUNA", "Direccion": "CAMINO SANTA ROSA, S/N", "Telefono": "922-592347 y 922-592348", "CorreoElectronico": "38002326@gobiernodecanarias.org" },
+                { "Codigo": "38003653", "Denominacion": "CEIP SANTA TERESA DE JESÚS", "Municipio": "LA OROTAVA", "Direccion": "C/ LA MONTAÑETA, 11", "Telefono": "922-478701", "CorreoElectronico": "38003653@gobiernodecanarias.org" },
+                { "Codigo": "38006459", "Denominacion": "CEIP SANTA ÚRSULA", "Municipio": "SANTA ÚRSULA", "Direccion": "C/ TOSCA DE LA IGLESIA, 4", "Telefono": "922-592207", "CorreoElectronico": "38006459@gobiernodecanarias.org" },
+                { "Codigo": "38001425", "Denominacion": "CEIP SANTO DOMINGO", "Municipio": "LA GUANCHA", "Direccion": "C/ PEATONAL LA IGLESIA, S/N", "Telefono": "922-360521", "CorreoElectronico": "38001425@gobiernodecanarias.org" },
+                { "Codigo": "38009680", "Denominacion": "CEIP SANTO DOMINGO", "Municipio": "LA VICTORIA DE ACENTEJO", "Direccion": "C/ PEDRERA, 5", "Telefono": "922-478799", "CorreoElectronico": "38009680@gobiernodecanarias.org" },
+                { "Codigo": "38010578", "Denominacion": "CEIP SANTO TOMÁS DE AQUINO", "Municipio": "LA OROTAVA", "Direccion": "CARRETERA GENERAL TF 21, (BLAS LUIS), 1", "Telefono": "922-592128", "CorreoElectronico": "38010578@gobiernodecanarias.org" },
+                { "Codigo": "38010891", "Denominacion": "CEIP SECUNDINO DELGADO", "Municipio": "SANTA CRUZ DE TENERIFE", "Direccion": "C/ DECANO CONSULAR JESÚS RAMOS, 8", "Telefono": "922-478800", "CorreoElectronico": "38010891@gobiernodecanarias.org" },
+                { "Codigo": "38006368", "Denominacion": "CEIP SOR FLORENTINA Y AGUSTÍN CABRERA DÍAZ", "Municipio": "SANTA CRUZ DE TENERIFE", "Direccion": "PLAZA NUESTRA SEÑORA DE FÁTIMA, S/N", "Telefono": "922-592448", "CorreoElectronico": "38006368@gobiernodecanarias.org" },
+                { "Codigo": "38005315", "Denominacion": "CEIP TAGOROR", "Municipio": "SANTA CRUZ DE TENERIFE", "Direccion": "C/ NÚÑEZ DE LA PEÑA, 33", "Telefono": "922-592178", "CorreoElectronico": "38005315@gobiernodecanarias.org" },
+                { "Codigo": "38006587", "Denominacion": "CEIP TAMAIMO", "Municipio": "SANTIAGO DEL TEIDE", "Direccion": "CTRA. GENERAL, 27", "Telefono": "922-592295", "CorreoElectronico": "38006587@gobiernodecanarias.org" },
+                { "Codigo": "38001589", "Denominacion": "CEIP TEOBALDO POWER", "Municipio": "GUÍA DE ISORA", "Direccion": "FINCA AGUADULCE, S/N", "Telefono": "922-922246", "CorreoElectronico": "38001589@gobiernodecanarias.org" },
+                { "Codigo": "38007154", "Denominacion": "CEIP TEÓFILO PÉREZ", "Municipio": "TEGUESTE", "Direccion": "C/ ANDRÉS GONZÁLEZ (CAÑERO), 6", "Telefono": "922-546051", "CorreoElectronico": "38007154@gobiernodecanarias.org" },
+                { "Codigo": "38006794", "Denominacion": "CEIP TIERRA DEL TRIGO", "Municipio": "LOS SILOS", "Direccion": "PLAZA DE LA IGLESIA, S/N", "Telefono": "922-923441", "CorreoElectronico": "38006794@gobiernodecanarias.org" },
+                { "Codigo": "38000093", "Denominacion": "CEIP TIJOCO BAJO", "Municipio": "ADEJE", "Direccion": "C/ JUAN AFONSO PLACERES, 37", "Telefono": "922-477276 y 922-477278", "CorreoElectronico": "38000093@gobiernodecanarias.org" },
+                { "Codigo": "38009527", "Denominacion": "CEIP TÍNCER", "Municipio": "SANTA CRUZ DE TENERIFE", "Direccion": "AVDA. DE TÍNCER , 40", "Telefono": "922-592569 y 680-485934", "CorreoElectronico": "38009527@gobiernodecanarias.org" },
+                { "Codigo": "38003914", "Denominacion": "CEIP TOMÁS DE IRIARTE", "Municipio": "PUERTO DE LA CRUZ", "Direccion": "PLAZA DE LA IGLESIA PEÑA DE FRANCIA, S/N", "Telefono": "922-478262", "CorreoElectronico": "38003914@gobiernodecanarias.org" },
+                { "Codigo": "38006137", "Denominacion": "CEIP TOMÉ CANO", "Municipio": "SANTA CRUZ DE TENERIFE", "Direccion": "C/ LEGAZPI, 2", "Telefono": "922-760341", "CorreoElectronico": "38006137@gobiernodecanarias.org" },
+                { "Codigo": "38000469", "Denominacion": "CEIP VALLE SAN LORENZO", "Municipio": "ARONA", "Direccion": "C/ COLEGIO, 20", "Telefono": "922-478786", "CorreoElectronico": "38000469@gobiernodecanarias.org" },
+                { "Codigo": "38008501", "Denominacion": "CEIP VICTORINO ALAYÓN", "Municipio": "EL TANQUE", "Direccion": "C/ TRINIDAD, S/N", "Telefono": "922-478513", "CorreoElectronico": "38008501@gobiernodecanarias.org" },
+                { "Codigo": "38008857", "Denominacion": "CEIP VÍCTOR RODRÍGUEZ JIMÉNEZ", "Municipio": "LA OROTAVA", "Direccion": "CTRA. GENERAL, 97", "Telefono": "922-474914", "CorreoElectronico": "38008857@gobiernodecanarias.org" },
+                { "Codigo": "38008067", "Denominacion": "CEIP VILLA ASCENSIÓN", "Municipio": "SANTA CRUZ DE TENERIFE", "Direccion": "C/ ELADIO ROCA SALAZAR, 2", "Telefono": "922-479367", "CorreoElectronico": "38008067@gobiernodecanarias.org" },
+                { "Codigo": "38000263", "Denominacion": "CEIP VILLA DE ARICO", "Municipio": "ARICO", "Direccion": "C/ EL CARMEN, 2", "Telefono": "922-479453", "CorreoElectronico": "38000263@gobiernodecanarias.org" },
+                { "Codigo": "38000330", "Denominacion": "CEIP VIRGEN DE FÁTIMA", "Municipio": "ARICO", "Direccion": "VILLA DE ARICO, 4", "Telefono": "922-760224", "CorreoElectronico": "38000330@gobiernodecanarias.org" },
+                { "Codigo": "38001280", "Denominacion": "CEIP VIRGEN DEL PILAR", "Municipio": "GRANADILLA DE ABONA", "Direccion": "CTRA. DE LAS VEGAS, S/N", "Telefono": "922-474085", "CorreoElectronico": "38001280@gobiernodecanarias.org" },
+                // EL HIERRO
+                { "Codigo": "38008006", "Denominacion": "CEIP EL MOCANAL JUANA MARÍA HERNÁNDEZ ARMAS", "Municipio": "VALVERDE", "Direccion": "C/ BARLOVENTO, 55", "Telefono": "922-478555", "CorreoElectronico": "38008006@gobiernodecanarias.org" },
+                { "Codigo": "38007294", "Denominacion": "CEIP GUARAZOCA", "Municipio": "VALVERDE", "Direccion": "C/ LA PASADA, 1", "Telefono": "922-592194", "CorreoElectronico": "38007294@gobiernodecanarias.org" },
+                { "Codigo": "38007312", "Denominacion": "CEIP ISORA", "Municipio": "VALVERDE", "Direccion": "C/ FERINTO, S/N", "Telefono": "922-760023", "CorreoElectronico": "38007312@gobiernodecanarias.org" },
+                { "Codigo": "38008985", "Denominacion": "CEIP LA RESTINGA", "Municipio": "EL PINAR DE EL HIERRO", "Direccion": "C/ ARENAS BLANCAS, 2", "Telefono": "922-474194", "CorreoElectronico": "38008985@gobiernodecanarias.org" },
+                { "Codigo": "38007361", "Denominacion": "CEIP SAN ANDRÉS", "Municipio": "VALVERDE", "Direccion": "C/ HILOCHOS, 26", "Telefono": "822-171695", "CorreoElectronico": "38007361@gobiernodecanarias.org" },
+                { "Codigo": "38000949", "Denominacion": "CEIP TAIBIQUE", "Municipio": "EL PINAR DE EL HIERRO", "Direccion": "C/ PATRICIO CABRERA, 3", "Telefono": "922-478508 y 922-478507", "CorreoElectronico": "38000949@gobiernodecanarias.org" },
+                { "Codigo": "38000913", "Denominacion": "CEIP TIGADAY", "Municipio": "FRONTERA", "Direccion": "C/ RUMBASO, 2", "Telefono": "922-478874", "CorreoElectronico": "38000913@gobiernodecanarias.org" },
+                { "Codigo": "38007373", "Denominacion": "CEIP VALVERDE", "Municipio": "VALVERDE", "Direccion": "C/ ASABANOS, 29", "Telefono": "922-747327", "CorreoElectronico": "38007373@gobiernodecanarias.org" },
+                { "Codigo": "38009631", "Denominacion": "CEPA VALVERDE", "Municipio": "VALVERDE", "Direccion": "C/ SIMÓN ACOSTA, S/N", "Telefono": "922-923382", "CorreoElectronico": "38009631@gobiernodecanarias.org" },
+                { "Codigo": "38017603", "Denominacion": "EEI DE VALVERDE", "Municipio": "VALVERDE", "Direccion": "C/ LOS BARRIALES, 2", "Telefono": "922-551676 y 922-550025", "CorreoElectronico": "valverde@aytovalverde.org" },
+                // FUERTEVENTURA
+                { "Codigo": "35006631", "Denominacion": "CEIP AGUSTÍN MILLARES CARLÓ", "Municipio": "PUERTO DEL ROSARIO", "Direccion": "AVDA. PRIMERO DE MAYO, 146", "Telefono": "928-478520 y 928-478519", "CorreoElectronico": "35006631@gobiernodecanarias.org" },
+                { "Codigo": "35006722", "Denominacion": "CEIP ALCALDESA AMPARO TORRES", "Municipio": "BETANCURIA", "Direccion": "C/ AMADOR RGUEZ., 2", "Telefono": "928-303317", "CorreoElectronico": "35006722@gobiernodecanarias.org" },
+                { "Codigo": "35006084", "Denominacion": "CEIP AMPUYENTA", "Municipio": "PUERTO DEL ROSARIO", "Direccion": "LA AMPUYENTA", "Telefono": "928-393040", "CorreoElectronico": "35006084@gobiernodecanarias.org" },
+                { "Codigo": "35014032", "Denominacion": "CEIP ANTOÑITO EL FARERO", "Municipio": "LA OLIVA", "Direccion": "AVDA. JUAN CARLOS I", "Telefono": "928-478525", "CorreoElectronico": "35014032@gobiernodecanarias.org" },
+                { "Codigo": "35005171", "Denominacion": "CEIP BERNABÉ FIGUEROA UMPIÉRREZ", "Municipio": "LA OLIVA", "Direccion": "PLAZA DE LA IGLESIA, 2", "Telefono": "928-599173", "CorreoElectronico": "35005171@gobiernodecanarias.org" },
+                { "Codigo": "35005596", "Denominacion": "CEIP CASILLAS DEL ÁNGEL", "Municipio": "PUERTO DEL ROSARIO", "Direccion": "CASILLAS DEL ÁNGEL", "Telefono": "928-655997 y 690-821573", "CorreoElectronico": "35005596@gobiernodecanarias.org" },
+                { "Codigo": "35013672", "Denominacion": "CEIP COSTA CALMA", "Municipio": "PÁJARA", "Direccion": "C/ MONTAÑA HENDIDA, 2", "Telefono": "928-455069", "CorreoElectronico": "35013672@gobiernodecanarias.org" },
+                { "Codigo": "35004622", "Denominacion": "CEIP CRISTÓBAL GARCÍA BLAIRZY", "Municipio": "TUINEJE", "Direccion": "C/ LEÓN Y CASTILLO, 2", "Telefono": "928-599131", "CorreoElectronico": "35004622@gobiernodecanarias.org" },
+                { "Codigo": "35005602", "Denominacion": "CEIP DOMINGO JUAN MANRIQUE", "Municipio": "PUERTO DEL ROSARIO", "Direccion": "C/ TETIR, S/N", "Telefono": "928-599232", "CorreoElectronico": "35005602@gobiernodecanarias.org" },
+                { "Codigo": "35014755", "Denominacion": "CEIP EL CASTILLO", "Municipio": "ANTIGUA", "Direccion": "AVDA. ÁNGEL JOVÉ, S/N", "Telefono": "928-577815", "CorreoElectronico": "35014755@gobiernodecanarias.org" },
+                { "Codigo": "35009607", "Denominacion": "CEIP EL CIERVO", "Municipio": "PÁJARA", "Direccion": "C/ QUEVEDO, 117", "Telefono": "928-325430", "CorreoElectronico": "35009607@gobiernodecanarias.org" },
+                { "Codigo": "35005641", "Denominacion": "CEIP FRANCISCA PÉREZ", "Municipio": "ANTIGUA", "Direccion": "TRIQUIVIJATE", "Telefono": "928-429797", "CorreoElectronico": "35005641@gobiernodecanarias.org" },
+                { "Codigo": "35013799", "Denominacion": "CEIP FRANCISCO NAVARRO ARTILES", "Municipio": "PUERTO DEL ROSARIO", "Direccion": "C/ LOS CAMELLEROS, 160", "Telefono": "928-577817", "CorreoElectronico": "35013799@gobiernodecanarias.org" },
+                { "Codigo": "35008317", "Denominacion": "CEIP GRAN TARAJAL", "Municipio": "TUINEJE", "Direccion": "URB. EL PALMERAL, S/N", "Telefono": "928-478718", "CorreoElectronico": "35008317@gobiernodecanarias.org" },
+                { "Codigo": "35006734", "Denominacion": "CEIP GUMERSINDO MARTELL", "Municipio": "BETANCURIA", "Direccion": "C/ REY ABÁN, 2", "Telefono": "928-393026", "CorreoElectronico": "35006734@gobiernodecanarias.org" },
+                { "Codigo": "35014019", "Denominacion": "CEIP LA HUBARA", "Municipio": "PUERTO DEL ROSARIO", "Direccion": "C/ TENDERETE, Nº1", "Telefono": "928-304441", "CorreoElectronico": "35014019@gobiernodecanarias.org" },
+                { "Codigo": "35005183", "Denominacion": "CEIP LAJARES", "Municipio": "LA OLIVA", "Direccion": "C/ CENTRAL, S/N", "Telefono": "928-599145", "CorreoElectronico": "35005183@gobiernodecanarias.org" },
+                { "Codigo": "35009140", "Denominacion": "CEIP LA LAJITA", "Municipio": "PÁJARA", "Direccion": "C/ SISE, Nº 2", "Telefono": "928-724761", "CorreoElectronico": "35009140@gobiernodecanarias.org" },
+                { "Codigo": "35000963", "Denominacion": "CEIP LA OLIVA", "Municipio": "LA OLIVA", "Direccion": "C/ GREGORIO HORMIGA, 2", "Telefono": "928-599104", "CorreoElectronico": "35000963@gobiernodecanarias.org" },
+                { "Codigo": "35007571", "Denominacion": "CEIP LAS PLAYITAS", "Municipio": "TUINEJE", "Direccion": "C/ ALCALDE JUAN JOSÉ ALONSO ÁVILA S/N", "Telefono": "928-393030", "CorreoElectronico": "35007571@gobiernodecanarias.org" },
+                { "Codigo": "35009437", "Denominacion": "CEIP MARÍA CASTRILLO GARCÍA", "Municipio": "LA OLIVA", "Direccion": "AVDA. JUAN CARLOS I, 30", "Telefono": "928-599272 y 639-979620", "CorreoElectronico": "35009437@gobiernodecanarias.org" },
+                { "Codigo": "35001025", "Denominacion": "CEIP MORRO JABLE", "Municipio": "PÁJARA", "Direccion": "C/ MASCONA, 40", "Telefono": "928-599393", "CorreoElectronico": "35001025@gobiernodecanarias.org" },
+                { "Codigo": "35015541", "Denominacion": "CEIP MORRO JABLE II", "Municipio": "PÁJARA", "Direccion": "C/ PIO BAROJA, S/N", "Telefono": "928-478803", "CorreoElectronico": "35015541@gobiernodecanarias.org" },
+                { "Codigo": "35007908", "Denominacion": "CEIP PABLO NERUDA", "Municipio": "PUERTO DEL ROSARIO", "Direccion": "C/ JACINTO BENAVENTE, 2", "Telefono": "928-478621", "CorreoElectronico": "35007908@gobiernodecanarias.org" },
+                { "Codigo": "35001049", "Denominacion": "CEIP PÁJARA", "Municipio": "PÁJARA", "Direccion": "C/ PICO DE LA PILA, 30", "Telefono": "928-478626", "CorreoElectronico": "35001049@gobiernodecanarias.org" },
+                { "Codigo": "35014007", "Denominacion": "CEIP PARQUE NATURAL CORRALEJO", "Municipio": "LA OLIVA", "Direccion": "C/ TÓRTOLA, 20", "Telefono": "928-325323", "CorreoElectronico": "35014007@gobiernodecanarias.org" },
+                { "Codigo": "35005808", "Denominacion": "CEIP POETA DOMINGO VELÁZQUEZ", "Municipio": "PUERTO DEL ROSARIO", "Direccion": "C/ EL BERNEGAL, 48", "Telefono": "928-304506", "CorreoElectronico": "35005808@gobiernodecanarias.org" },
+                { "Codigo": "35015701", "Denominacion": "CEIP PUERTO CABRAS", "Municipio": "PUERTO DEL ROSARIO", "Direccion": "C/ LOS SABANDEÑOS, 125", "Telefono": "928-577826", "CorreoElectronico": "35015701@gobiernodecanarias.org" },
+                { "Codigo": "35003678", "Denominacion": "CEIP PUERTO DEL ROSARIO", "Municipio": "PUERTO DEL ROSARIO", "Direccion": "C/ HERBANIA, 3", "Telefono": "928-307018", "CorreoElectronico": "35003678@gobiernodecanarias.org" },
+                { "Codigo": "35003617", "Denominacion": "CEIP SAN JOSÉ DE CALASANZ", "Municipio": "PUERTO DEL ROSARIO", "Direccion": "C/ LOUIS BRAILLE, 2", "Telefono": "928-304459", "CorreoElectronico": "35003617@gobiernodecanarias.org" },
+                { "Codigo": "35006001", "Denominacion": "CEIP TARAJALEJO", "Municipio": "TUINEJE", "Direccion": "C/ CABRERA MARTÍN, S/N", "Telefono": "928-578482", "CorreoElectronico": "35006001@gobiernodecanarias.org" },
+                { "Codigo": "35005811", "Denominacion": "CEIP TEFÍA", "Municipio": "PUERTO DEL ROSARIO", "Direccion": "TEFÍA, 36", "Telefono": "928-655995", "CorreoElectronico": "35005811@gobiernodecanarias.org" },
+                { "Codigo": "35006011", "Denominacion": "CEIP TESEJERAGUE", "Municipio": "TUINEJE", "Direccion": "TESEJERAGUE, S/N", "Telefono": "928-303103", "CorreoElectronico": "35006011@gobiernodecanarias.org" },
+                { "Codigo": "35005195", "Denominacion": "CEIP TINDAYA", "Municipio": "LA OLIVA", "Direccion": "C/ VIRGEN DE LA CARIDAD, S/N", "Telefono": "928-303137", "CorreoElectronico": "35005195@gobiernodecanarias.org" },
+                { "Codigo": "35005092", "Denominacion": "CEIP TISCAMANITA", "Municipio": "TUINEJE", "Direccion": "CTRA. GENERAL TISCAMANITA S/N", "Telefono": "928-478599", "CorreoElectronico": "35005092@gobiernodecanarias.org" },
+                { "Codigo": "35005201", "Denominacion": "CEIP TOSTÓN", "Municipio": "LA OLIVA", "Direccion": "C/ MUELLE DE PESCADORES, S/N", "Telefono": "928-303133", "CorreoElectronico": "35005201@gobiernodecanarias.org" },
+                { "Codigo": "35009164", "Denominacion": "CEIP TUINEJE", "Municipio": "TUINEJE", "Direccion": "C/ LA QUINTA BAJA, S/N", "Telefono": "928-118161", "CorreoElectronico": "35009164@gobiernodecanarias.org" },
+                { "Codigo": "35000185", "Denominacion": "CEIP VALLES DE ORTEGA", "Municipio": "ANTIGUA", "Direccion": "VALLES DE ORTEGA", "Telefono": "928-303136", "CorreoElectronico": "35000185@gobiernodecanarias.org" },
+                { "Codigo": "35001013", "Denominacion": "CEIP VILLAVERDE", "Municipio": "LA OLIVA", "Direccion": "CALLE DEL CENTRO, 125", "Telefono": "928-868642", "CorreoElectronico": "35001013@gobiernodecanarias.org" },
+                { "Codigo": "35008007", "Denominacion": "CEPA FUERTEVENTURA NORTE", "Municipio": "PUERTO DEL ROSARIO", "Direccion": "C/ MAJADA DE MARCIAL, S/N", "Telefono": "928-861024 y 928-851956", "CorreoElectronico": "35008007@gobiernodecanarias.org" },
+                { "Codigo": "35010181", "Denominacion": "CEPA FUERTEVENTURA SUR", "Municipio": "TUINEJE", "Direccion": "CTRA. EL ACEITÚN, S/N", "Telefono": "928-162384", "CorreoElectronico": "35010181@gobiernodecanarias.org" },
+                { "Codigo": "35015176", "Denominacion": "EEI BAMBI", "Municipio": "PUERTO DEL ROSARIO", "Direccion": "C/ LOS CAMELLEROS, 154", "Telefono": "928-850110 y 928-173662", "CorreoElectronico": "eibambipuerto@gmail.com" },
+                { "Codigo": "35015164", "Denominacion": "EEI CORRALEJO", "Municipio": "LA OLIVA", "Direccion": "C/ ATALAYA S/N", "Telefono": "928-328258", "CorreoElectronico": "mariolagm@laoliva.net" },
+                { "Codigo": "35014536", "Denominacion": "EEI LAS HORMIGUITAS", "Municipio": "PUERTO DEL ROSARIO", "Direccion": "C/ FOTÓGRAFO HERRERA, S/N", "Telefono": "928-548472 y 649-990539", "CorreoElectronico": "administracion@lashormiguitas.es" },
+                { "Codigo": "35015486", "Denominacion": "EEI MORRO JABLE", "Municipio": "PÁJARA", "Direccion": "C/ MASCONA, 38", "Telefono": "928-541271", "CorreoElectronico": "directoraooaa@pajara.es" },
+                { "Codigo": "35003642", "Denominacion": "RE PUERTO DEL ROSARIO", "Municipio": "PUERTO DEL ROSARIO", "Direccion": "C/ HERBANIA, 1", "Telefono": "928-851120", "CorreoElectronico": "35003642@gobiernodecanarias.org" },
+                // GRAN CANARIA
+                { "Codigo": "35005420", "Denominacion": "CEIP ADÁN DEL CASTILLO", "Municipio": "LAS PALMAS DE GRAN CANARIA", "Direccion": "PASEO DE LOS MÁRTIRES, 4", "Telefono": "928-304078", "CorreoElectronico": "35005420@gobiernodecanarias.org" },
+                { "Codigo": "35003459", "Denominacion": "CEIP ADELA SANTANA", "Municipio": "LAS PALMAS DE GRAN CANARIA", "Direccion": "CALLE LAS MAGNOLIAS, 12", "Telefono": "928-304417", "CorreoElectronico": "35003459@gobiernodecanarias.org" },
+                { "Codigo": "35008721", "Denominacion": "CEIP AGUADULCE", "Municipio": "LAS PALMAS DE GRAN CANARIA", "Direccion": "C/ MOLINO DE VIENTO, 18", "Telefono": "928-599212", "CorreoElectronico": "35008721@gobiernodecanarias.org" },
+                { "Codigo": "35000768", "Denominacion": "CEIP AGUATONA", "Municipio": "INGENIO", "Direccion": "C/ GADIFER DE LA SALLE, S/N", "Telefono": "928-303099", "CorreoElectronico": "35000768@gobiernodecanarias.org" },
+                { "Codigo": "35000914", "Denominacion": "CEIP AGUSTÍN HERNÁNDEZ DÍAZ", "Municipio": "MOYA", "Direccion": "C/ SECRETARIO JUAN GONZÁLEZ LEÓN, 7", "Telefono": "928-303355", "CorreoElectronico": "35000914@gobiernodecanarias.org" },
+                // LA GOMERA
+                { "Codigo": "38000135", "Denominacion": "CEIP ALAJERÓ", "Municipio": "ALAJERÓ", "Direccion": "C/ COLUMBA, S/N", "Telefono": "922-592125", "CorreoElectronico": "38000135@gobiernodecanarias.org" },
+                { "Codigo": "38007476", "Denominacion": "CEIP ALOJERA", "Municipio": "VALLEHERMOSO", "Direccion": "LA PLAZA, S/N", "Telefono": "922-922028", "CorreoElectronico": "38007476@gobiernodecanarias.org" },
+                { "Codigo": "38000101", "Denominacion": "CEIP ÁUREA MIRANDA GONZÁLEZ", "Municipio": "AGULO", "Direccion": "C/ ALAMEDA, S/N", "Telefono": "922-922030", "CorreoElectronico": "38000101@gobiernodecanarias.org" },
+                { "Codigo": "38007452", "Denominacion": "CEIP EL RETAMAL", "Municipio": "VALLE GRAN REY", "Direccion": "LOMO DEL BALO", "Telefono": "922-760980", "CorreoElectronico": "38007452@gobiernodecanarias.org" },
+                { "Codigo": "38009175", "Denominacion": "CEIP LA LOMADA", "Municipio": "SAN SEBASTIÁN DE LA GOMERA", "Direccion": "CAMINO DE PUNTALLANA, 71", "Telefono": "922-475568", "CorreoElectronico": "38009175@gobiernodecanarias.org" },
+                { "Codigo": "38004891", "Denominacion": "CEIP RUIZ DE PADRÓN", "Municipio": "SAN SEBASTIÁN DE LA GOMERA", "Direccion": "C/ GARCÍA CABRERA, 2", "Telefono": "922-478749", "CorreoElectronico": "38004891@gobiernodecanarias.org" },
+                { "Codigo": "38007622", "Denominacion": "CEIP TEMOCODÁ", "Municipio": "VALLEHERMOSO", "Direccion": "LOS PAJAREJOS, S/N - TEMOCODÁ", "Telefono": "922-923407", "CorreoElectronico": "38007622@gobiernodecanarias.org" },
+                { "Codigo": "38009618", "Denominacion": "CEPA LA GOMERA", "Municipio": "SAN SEBASTIÁN DE LA GOMERA", "Direccion": "AVDA. JOSÉ AGUIAR, S/N", "Telefono": "922-592717 y 922-592718", "CorreoElectronico": "38009618@gobiernodecanarias.org" },
+                { "Codigo": "38015527", "Denominacion": "EEI AGULO", "Municipio": "AGULO", "Direccion": "C/ ALAMEDA, S/N", "Telefono": "922-146103", "CorreoElectronico": "mariatrujillo74@hotmail.com" },
+                { "Codigo": "38017160", "Denominacion": "EEI VALLE GRAN REY", "Municipio": "VALLE GRAN REY", "Direccion": "C/ LOMO DEL BALO", "Telefono": "922-805811 y 922-806260", "CorreoElectronico": "escuelainfantil@vallegranrey.es" },
+                { "Codigo": "38017184", "Denominacion": "EEI VALLEHERMOSO", "Municipio": "VALLEHERMOSO", "Direccion": "AVDA. GUILLERMO ASCANIO MORENO S/N", "Telefono": "922-800587", "CorreoElectronico": "escueladeinfantilvallehermoso@gmail.com" },
+                { "Codigo": "38004931", "Denominacion": "RE SAN SEBASTIÁN DE LA GOMERA", "Municipio": "SAN SEBASTIÁN DE LA GOMERA", "Direccion": "AVDA. JOSÉ AGUIAR S/N", "Telefono": "922-871461 y 922-870915", "CorreoElectronico": "38004931@gobiernodecanarias.org" },
+                // LANZAROTE
+                { "Codigo": "35000239", "Denominacion": "CEIP ADOLFO TOPHAM", "Municipio": "ARRECIFE", "Direccion": "C/ DOCTOR GÓMEZ ULLA, 71", "Telefono": "928-306888", "CorreoElectronico": "35000239@gobiernodecanarias.org" },
+                { "Codigo": "35003708", "Denominacion": "CEIP AJEI", "Municipio": "SAN BARTOLOMÉ", "Direccion": "C/ CONSTITUCIÓN, 9", "Telefono": "928-303733", "CorreoElectronico": "35003708@gobiernodecanarias.org" },
+                { "Codigo": "35013933", "Denominacion": "CEIP ALCALDE ALEXIS TEJERA LEMES", "Municipio": "SAN BARTOLOMÉ", "Direccion": "C/ CÉSAR MANRIQUE, S/N", "Telefono": "928-577870", "CorreoElectronico": "35013933@gobiernodecanarias.org" },
+                { "Codigo": "35004609", "Denominacion": "CEIP ALCALDE RAFAEL CEDRÉS", "Municipio": "TÍAS", "Direccion": "C/ IGUALDAD, 5", "Telefono": "928-304061", "CorreoElectronico": "35004609@gobiernodecanarias.org" },
+                { "Codigo": "35006199", "Denominacion": "CEIP ANTONIO ZEROLO", "Municipio": "ARRECIFE", "Direccion": "C/ GUENIA, 3", "Telefono": "928-499566", "CorreoElectronico": "35006199@gobiernodecanarias.org" },
+                { "Codigo": "35008071", "Denominacion": "CEIP ARGANA ALTA", "Municipio": "ARRECIFE", "Direccion": "C/ CAMPOAMOR, 14", "Telefono": "928-455036", "CorreoElectronico": "35008071@gobiernodecanarias.org" },
+                { "Codigo": "35000227", "Denominacion": "CEIP BENITO MÉNDEZ TARAJANO", "Municipio": "ARRECIFE", "Direccion": "C/ SEVERO OCHOA, 29", "Telefono": "928-499541", "CorreoElectronico": "35000227@gobiernodecanarias.org" },
+                { "Codigo": "35007741", "Denominacion": "CEIP CAPELLANÍA DEL YÁGABO", "Municipio": "ARRECIFE", "Direccion": "C/ SEVERO OCHOA Nº 1", "Telefono": "928-599206", "CorreoElectronico": "35007741@gobiernodecanarias.org" },
+                { "Codigo": "35004208", "Denominacion": "CEIP CÉSAR MANRIQUE CABRERA", "Municipio": "TEGUISE", "Direccion": "C/ RAFAEL ALBERTI, S/N", "Telefono": "928-303027", "CorreoElectronico": "35004208@gobiernodecanarias.org" },
+                { "Codigo": "35005067", "Denominacion": "CEIP CONCEPCIÓN RODRÍGUEZ ARTILES", "Municipio": "TÍAS", "Direccion": "C/ TERRERO, 2", "Telefono": "928-304584", "CorreoElectronico": "35005067@gobiernodecanarias.org" },
+                { "Codigo": "35013878", "Denominacion": "CEIP COSTA TEGUISE", "Municipio": "TEGUISE", "Direccion": "C/ MALAGUEÑA, S/N", "Telefono": "928-346647 y 638-749383", "CorreoElectronico": "35013878@gobiernodecanarias.org" },
+                { "Codigo": "35004211", "Denominacion": "CEIP DOCTOR ALFONSO SPÍNOLA", "Municipio": "TEGUISE", "Direccion": "C/ GARAJONAY, S/N", "Telefono": "928-599387", "CorreoElectronico": "35004211@gobiernodecanarias.org" },
+                { "Codigo": "35007167", "Denominacion": "CEIP EL CUCHILLO", "Municipio": "TINAJO", "Direccion": "EL CUCHILLO, 21", "Telefono": "928-478517", "CorreoElectronico": "35007167@gobiernodecanarias.org" },
+                { "Codigo": "35005274", "Denominacion": "CEIP GUENIA", "Municipio": "TEGUISE", "Direccion": "C/ TANAUSÚ, 10", "Telefono": "928-304405", "CorreoElectronico": "35005274@gobiernodecanarias.org" },
+                { "Codigo": "35005079", "Denominacion": "CEIP GUIGUAN", "Municipio": "TINAJO", "Direccion": "C/ AGUA CLARA, 2", "Telefono": "928-117818", "CorreoElectronico": "35005079@gobiernodecanarias.org" },
+                { "Codigo": "35007775", "Denominacion": "CEIP GÜIME", "Municipio": "SAN BARTOLOMÉ", "Direccion": "LA CARRETERA, S/N", "Telefono": "928-521224", "CorreoElectronico": "35007775@gobiernodecanarias.org" },
+                { "Codigo": "35006953", "Denominacion": "CEIP LA ASOMADA - MÁCHER", "Municipio": "TÍAS", "Direccion": "C/ CAMINO LOS OLIVOS , 73", "Telefono": "928-499547", "CorreoElectronico": "35006953@gobiernodecanarias.org" },
+                { "Codigo": "35007556", "Denominacion": "CEIP LA CALETA DE FAMARA", "Municipio": "TEGUISE", "Direccion": "LA CALETA", "Telefono": "928-303007", "CorreoElectronico": "35007556@gobiernodecanarias.org" },
+                { "Codigo": "35000197", "Denominacion": "CEIP LA DESTILA", "Municipio": "ARRECIFE", "Direccion": "C/ LA INÉS", "Telefono": "928-211640 y 928-211641", "CorreoElectronico": "35000197@gobiernodecanarias.org" },
+                { "Codigo": "35006758", "Denominacion": "CEIP LA GARITA", "Municipio": "HARÍA", "Direccion": "C/ LA MARINA, S/N", "Telefono": "928-304087", "CorreoElectronico": "35006758@gobiernodecanarias.org" },
+                { "Codigo": "35006989", "Denominacion": "CEIP LAS BREÑAS", "Municipio": "YAIZA", "Direccion": "C/ PLAZA SAN LUIS, 4", "Telefono": "928-211633", "CorreoElectronico": "35006989@gobiernodecanarias.org" },
+                { "Codigo": "35000756", "Denominacion": "CEIP LAS MERCEDES", "Municipio": "HARÍA", "Direccion": "C/ VILLA NUEVA, 8", "Telefono": "928-304080", "CorreoElectronico": "35000756@gobiernodecanarias.org" },
+                { "Codigo": "35005080", "Denominacion": "CEIP LA VEGUETA", "Municipio": "TINAJO", "Direccion": "C/ PALACIO, 14", "Telefono": "928-838028", "CorreoElectronico": "35005080@gobiernodecanarias.org" },
+                { "Codigo": "35006539", "Denominacion": "CEIP LOS GERANIOS", "Municipio": "ARRECIFE", "Direccion": "C/ MOSTA, 1.URB.LOS GERANIOS", "Telefono": "928-306570", "CorreoElectronico": "35006539@gobiernodecanarias.org" },
+                { "Codigo": "35006928", "Denominacion": "CEIP LOS VALLES", "Municipio": "TEGUISE", "Direccion": "C/ ARRORRÓ, 4", "Telefono": "928-899796", "CorreoElectronico": "35006928@gobiernodecanarias.org" },
+                { "Codigo": "35006990", "Denominacion": "CEIP MARARÍA", "Municipio": "YAIZA", "Direccion": "AVDA. EL RUBICÓN, 12", "Telefono": "928-478533", "CorreoElectronico": "35006990@gobiernodecanarias.org" },
+                { "Codigo": "35005225", "Denominacion": "CEIP MARÍA AUXILIADORA", "Municipio": "SAN BARTOLOMÉ", "Direccion": "C/ LOMO TESA, 40", "Telefono": "928-303328", "CorreoElectronico": "35005225@gobiernodecanarias.org" },
+                { "Codigo": "35006898", "Denominacion": "CEIP MUÑIQUE", "Municipio": "TEGUISE", "Direccion": "C/ LA ERA, 12", "Telefono": "928-303159", "CorreoElectronico": "35006898@gobiernodecanarias.org" },
+                { "Codigo": "35007568", "Denominacion": "CEIP NAZARET", "Municipio": "TEGUISE", "Direccion": "LAS ABUBILLAS, 4", "Telefono": "928-117128", "CorreoElectronico": "35007568@gobiernodecanarias.org" },
+                { "Codigo": "35006667", "Denominacion": "CEIP NIEVES TOLEDO", "Municipio": "ARRECIFE", "Direccion": "C/ EL INDIO, 19", "Telefono": "928-478594", "CorreoElectronico": "35006667@gobiernodecanarias.org" },
+                { "Codigo": "35007003", "Denominacion": "CEIP PLAYA BLANCA", "Municipio": "YAIZA", "Direccion": "C/ EUROPA Nº 11", "Telefono": "928-478587", "CorreoElectronico": "35007003@gobiernodecanarias.org" },
+                { "Codigo": "35009425", "Denominacion": "CEIP PLAYA HONDA", "Municipio": "SAN BARTOLOMÉ", "Direccion": "C/ SAN BORONDÓN, S/N", "Telefono": "928-899797", "CorreoElectronico": "35009425@gobiernodecanarias.org" },
+                { "Codigo": "35000720", "Denominacion": "CEIP SAN JUAN", "Municipio": "HARÍA", "Direccion": "C/ SANTIAGO NODA, 4", "Telefono": "928-835111 y 616-268080", "CorreoElectronico": "35000720@gobiernodecanarias.org" },
+                { "Codigo": "35004981", "Denominacion": "CEIP SOO", "Municipio": "TEGUISE", "Direccion": "C/ SAN JUAN EVANGELISTA, 157", "Telefono": "928-393048", "CorreoElectronico": "35004981@gobiernodecanarias.org" },
+                { "Codigo": "35006904", "Denominacion": "CEIP TAO", "Municipio": "TEGUISE", "Direccion": "C/ TAGARIFO, 25", "Telefono": "928-307588", "CorreoElectronico": "35006904@gobiernodecanarias.org" },
+                { "Codigo": "35000215", "Denominacion": "CEIP TITERROY", "Municipio": "ARRECIFE", "Direccion": "C/ TILAMA, 1", "Telefono": "928-455983", "CorreoElectronico": "35000215@gobiernodecanarias.org" },
+                { "Codigo": "35004816", "Denominacion": "CEIP UGA", "Municipio": "YAIZA", "Direccion": "C/ LOS VOLCANES,S/Nº", "Telefono": "928-393197 y 928-393198", "CorreoElectronico": "35004816@gobiernodecanarias.org" },
+                { "Codigo": "35004610", "Denominacion": "CEIP VIRGEN DE LOS VOLCANES", "Municipio": "TINAJO", "Direccion": "AVDA. DE LOS VOLCANES, 54", "Telefono": "928-117861", "CorreoElectronico": "35004610@gobiernodecanarias.org" },
+                { "Codigo": "35004828", "Denominacion": "CEIP YAIZA", "Municipio": "YAIZA", "Direccion": "EL BARRANCO, 1", "Telefono": "928-478529", "CorreoElectronico": "35004828@gobiernodecanarias.org" },
+                { "Codigo": "35007969", "Denominacion": "CEPA TITERROYGATRA", "Municipio": "ARRECIFE", "Direccion": "C/ CARLOS III, S/N", "Telefono": "928-800019 y 928-811400", "CorreoElectronico": "35007969@gobiernodecanarias.org" },
+                { "Codigo": "35014548", "Denominacion": "EEI DE ARRECIFE", "Municipio": "ARRECIFE", "Direccion": "C/ EL FORITO, 4", "Telefono": "928-589685", "CorreoElectronico": "novaschoolarrecife@novaschool.es" },
+                { "Codigo": "35015498", "Denominacion": "EEI LOLA", "Municipio": "TEGUISE", "Direccion": "C/ VIERA Y CLAVIJO, 4", "Telefono": "922-593065 y 928-845001", "CorreoElectronico": "jalba@teguise.es" },
+                { "Codigo": "35006680", "Denominacion": "RE HARÍA", "Municipio": "HARÍA", "Direccion": "C/ ENCARNACIÓN RODRÍGUEZ LASSO, 27", "Telefono": "928-835076", "CorreoElectronico": "35006680@gobiernodecanarias.org" },
+                // LA PALMA
+                { "Codigo": "38003756", "Denominacion": "CEIP ADAMANCASIS", "Municipio": "EL PASO", "Direccion": "AVDA. ISLAS CANARIAS, 40", "Telefono": "922-474963", "CorreoElectronico": "38003756@gobiernodecanarias.org" },
+                { "Codigo": "38005054", "Denominacion": "CEIP ANSELMO PÉREZ BRITO", "Municipio": "SANTA CRUZ DE LA PALMA", "Direccion": "C/ EL GALEÓN", "Telefono": "922-592281", "CorreoElectronico": "38005054@gobiernodecanarias.org" },
+                { "Codigo": "38003860", "Denominacion": "CEIP ARCO IRIS", "Municipio": "EL PASO", "Direccion": "C/ TENDIÑA, 38-B", "Telefono": "922-478814", "CorreoElectronico": "38003860@gobiernodecanarias.org" },
+                { "Codigo": "38009588", "Denominacion": "CEIP BENAHOARE", "Municipio": "SANTA CRUZ DE LA PALMA", "Direccion": "BARRANCO DE LAS NIEVES, S/N", "Telefono": "922-760355", "CorreoElectronico": "38009588@gobiernodecanarias.org" },
+                { "Codigo": "38000551", "Denominacion": "CEIP BOTAZO", "Municipio": "BREÑA ALTA", "Direccion": "EL ROBLE, 34", "Telefono": "922-592410", "CorreoElectronico": "38000551@gobiernodecanarias.org" },
+                { "Codigo": "38000561", "Denominacion": "CEIP BREÑA", "Municipio": "BREÑA ALTA", "Direccion": "CARRETERA SAN ISIDRO, 121", "Telefono": "922-592141", "CorreoElectronico": "38000561@gobiernodecanarias.org" },
+                { "Codigo": "38000615", "Denominacion": "CEIP BUENAVISTA DE ABAJO", "Municipio": "BREÑA ALTA", "Direccion": "BUENAVISTA DE ABAJO, 37", "Telefono": "922-478437", "CorreoElectronico": "38000615@gobiernodecanarias.org" },
+                { "Codigo": "38000974", "Denominacion": "CEIP CECILIA GONZÁLEZ ALAYÓN", "Municipio": "FUENCALIENTE DE LA PALMA", "Direccion": "LAS CALETAS, 28", "Telefono": "922-760826", "CorreoElectronico": "38000974@gobiernodecanarias.org" },
+                { "Codigo": "38010451", "Denominacion": "CEIP EL PUERTO", "Municipio": "TAZACORTE", "Direccion": "C/ CANARIAS, 8", "Telefono": "922-481089", "CorreoElectronico": "38010451@gobiernodecanarias.org" },
+                { "Codigo": "38009151", "Denominacion": "CEIP EL ROQUE", "Municipio": "LOS LLANOS DE ARIDANE", "Direccion": "C/ EUSEBIO BARRETO LORENZO, 38", "Telefono": "922-479429", "CorreoElectronico": "38009151@gobiernodecanarias.org" },
+                { "Codigo": "38010669", "Denominacion": "CEIP GABRIEL DUQUE ACOSTA", "Municipio": "SANTA CRUZ DE LA PALMA", "Direccion": "AVDA. EL PUENTE, 50", "Telefono": "922-478526", "CorreoElectronico": "38010669@gobiernodecanarias.org" },
+                { "Codigo": "38008869", "Denominacion": "CEIP JEDEY", "Municipio": "EL PASO", "Direccion": "C/ CAMPANARIO, 2", "Telefono": "922-494115", "CorreoElectronico": "38008869@gobiernodecanarias.org" },
+                { "Codigo": "38004633", "Denominacion": "CEIP JOSÉ LUIS ALBENDEA Y GÓMEZ DE ARANDA", "Municipio": "SAN ANDRÉS Y SAUCES", "Direccion": "C/ JUAN CARLOS I, 20", "Telefono": "922-479452", "CorreoElectronico": "38004633@gobiernodecanarias.org" },
+                { "Codigo": "38005017", "Denominacion": "CEIP JOSÉ PÉREZ VIDAL", "Municipio": "SANTA CRUZ DE LA PALMA", "Direccion": "C/ ANTONIO RODRÍGUEZ LÓPEZ, 35", "Telefono": "922-476558", "CorreoElectronico": "38005017@gobiernodecanarias.org" },
+                { "Codigo": "38000512", "Denominacion": "CEIP LA CUESTA", "Municipio": "BARLOVENTO", "Direccion": "LA CUESTA PARTE BAJA, 53", "Telefono": "822-171621", "CorreoElectronico": "38000512@gobiernodecanarias.org" },
+                { "Codigo": "38004086", "Denominacion": "CEIP LA GALGA", "Municipio": "PUNTALLANA", "Direccion": "LLANO MOLINO, 1", "Telefono": "922-474082", "CorreoElectronico": "38004086@gobiernodecanarias.org" },
+                { "Codigo": "38003306", "Denominacion": "CEIP LA LAGUNA", "Municipio": "LOS LLANOS DE ARIDANE", "Direccion": "C/ CRUZ CHICA, 37", "Telefono": "822-179187", "CorreoElectronico": "38003306@gobiernodecanarias.org" },
+                { "Codigo": "38010426", "Denominacion": "CEIP LA ROSA-CAMINO VIEJO", "Municipio": "EL PASO", "Direccion": "C/ UGRANFIR", "Telefono": "922-592386", "CorreoElectronico": "38010426@gobiernodecanarias.org" },
+                { "Codigo": "38010268", "Denominacion": "CEIP LA SABINA", "Municipio": "VILLA DE MAZO", "Direccion": "LA SABINA, 170", "Telefono": "922-592300", "CorreoElectronico": "38010268@gobiernodecanarias.org" },
+                { "Codigo": "38000494", "Denominacion": "CEIP LAS CABEZADAS", "Municipio": "BARLOVENTO", "Direccion": "CALLE LOMO LA FLORIDA,26. LOMO LA FLORIDA", "Telefono": "922-922297", "CorreoElectronico": "38000494@gobiernodecanarias.org" },
+                { "Codigo": "38000986", "Denominacion": "CEIP LAS INDIAS", "Municipio": "FUENCALIENTE DE LA PALMA", "Direccion": "CTRA. GENERAL LAS INDIAS", "Telefono": "922-592196", "CorreoElectronico": "38000986@gobiernodecanarias.org" },
+                { "Codigo": "38000688", "Denominacion": "CEIP LAS LEDAS", "Municipio": "BREÑA BAJA", "Direccion": "LA MONTAÑA", "Telefono": "922-476919", "CorreoElectronico": "38000688@gobiernodecanarias.org" },
+                { "Codigo": "38003288", "Denominacion": "CEIP LAS MANCHAS", "Municipio": "LOS LLANOS DE ARIDANE", "Direccion": "CAMINO LAS MANCHAS, 17", "Telefono": "922-760377", "CorreoElectronico": "38003288@gobiernodecanarias.org" },
+                { "Codigo": "38003148", "Denominacion": "CEIP LOS CAMPITOS", "Municipio": "LOS LLANOS DE ARIDANE", "Direccion": "C/ EL PASTELERO, 103", "Telefono": "922-463861", "CorreoElectronico": "38003148@gobiernodecanarias.org" },
+                { "Codigo": "38000962", "Denominacion": "CEIP LOS CANARIOS", "Municipio": "FUENCALIENTE DE LA PALMA", "Direccion": "C/ ANTONIO HERNÁNDEZ HERNÁNDEZ, 16", "Telefono": "922-592415", "CorreoElectronico": "38000962@gobiernodecanarias.org" },
+                { "Codigo": "38004554", "Denominacion": "CEIP LOS GALGUITOS", "Municipio": "SAN ANDRÉS Y SAUCES", "Direccion": "C/ GARACHICO, 72 (LOS GALGUITOS)", "Telefono": "822-171722", "CorreoElectronico": "38004554@gobiernodecanarias.org" },
+                { "Codigo": "38000597", "Denominacion": "CEIP MANUEL GALVÁN DE LAS CASAS", "Municipio": "BREÑA ALTA", "Direccion": "ELÍAS PÉREZ HDEZ., 49", "Telefono": "922-592323", "CorreoElectronico": "38000597@gobiernodecanarias.org" },
+                { "Codigo": "38003291", "Denominacion": "CEIP MARÍA MILAGROS ACOSTA GARCÍA", "Municipio": "LOS LLANOS DE ARIDANE", "Direccion": "CTRA. GENERAL EL REMO", "Telefono": "922-408281", "CorreoElectronico": "38003291@gobiernodecanarias.org" },
+                { "Codigo": "38003185", "Denominacion": "CEIP MARIELA CÁCERES PÉREZ", "Municipio": "LOS LLANOS DE ARIDANE", "Direccion": "C/ VIERA Y CLAVIJO, S/N", "Telefono": "922-760028", "CorreoElectronico": "38003185@gobiernodecanarias.org" },
+                { "Codigo": "38003173", "Denominacion": "CEIP MAYANTIGO", "Municipio": "LOS LLANOS DE ARIDANE", "Direccion": "C/ TABAIBA, 20", "Telefono": "922-477197", "CorreoElectronico": "38003173@gobiernodecanarias.org" },
+                { "Codigo": "38000627", "Denominacion": "CEIP MIRANDA", "Municipio": "BREÑA ALTA", "Direccion": "MIRANDA - EL LLANITO, 59", "Telefono": "922-592350", "CorreoElectronico": "38000627@gobiernodecanarias.org" },
+                { "Codigo": "38007828", "Denominacion": "CEIP MONTE BREÑA", "Municipio": "VILLA DE MAZO", "Direccion": "C/ LA ROSA, 126", "Telefono": "922-592372", "CorreoElectronico": "38007828@gobiernodecanarias.org" },
+                { "Codigo": "38007853", "Denominacion": "CEIP MONTES DE LUNA", "Municipio": "VILLA DE MAZO", "Direccion": "MONTES DE LUNA", "Telefono": "922-760825", "CorreoElectronico": "38007853@gobiernodecanarias.org" },
+                { "Codigo": "38008651", "Denominacion": "CEIP PRINCESA ARECIDA", "Municipio": "VILLA DE MAZO", "Direccion": "C/ CARMEN MARTÍNEZ JEREZ, 3", "Telefono": "922-592320", "CorreoElectronico": "38008651@gobiernodecanarias.org" },
+                { "Codigo": "38004062", "Denominacion": "CEIP PUNTAGORDA", "Municipio": "PUNTAGORDA", "Direccion": "TRANS. AVDA. LOS ALMENDROS, S/N", "Telefono": "922-923948", "CorreoElectronico": "38004062@gobiernodecanarias.org" },
+                { "Codigo": "38004116", "Denominacion": "CEIP PUNTALLANA", "Municipio": "PUNTALLANA", "Direccion": "AVDA. ATABARA, 1", "Telefono": "922-760333", "CorreoElectronico": "38004116@gobiernodecanarias.org" },
+                { "Codigo": "38004098", "Denominacion": "CEIP RITA RODRÍGUEZ ÁLVAREZ", "Municipio": "PUNTALLANA", "Direccion": "C/ CRUZ HERRERA, 12", "Telefono": "922-478501", "CorreoElectronico": "38004098@gobiernodecanarias.org" },
+                { "Codigo": "38004131", "Denominacion": "CEIP SAGRADO CORAZÓN DE JESÚS", "Municipio": "PUNTALLANA", "Direccion": "LA LOMADITA, 19", "Telefono": "922-760762", "CorreoElectronico": "38004131@gobiernodecanarias.org" },
+                { "Codigo": "38008158", "Denominacion": "CEIP SAN ANDRÉS", "Municipio": "SAN ANDRÉS Y SAUCES", "Direccion": "C/ LA IGLESIA, 3", "Telefono": "922-592148", "CorreoElectronico": "38008158@gobiernodecanarias.org" },
+                { "Codigo": "38000706", "Denominacion": "CEIP SAN ANTONIO", "Municipio": "BREÑA BAJA", "Direccion": "C/ PETRA GALVÁN DE LAS CASAS, 49", "Telefono": "922-592298", "CorreoElectronico": "38000706@gobiernodecanarias.org" },
+                { "Codigo": "38000639", "Denominacion": "CEIP SAN JOSÉ", "Municipio": "BREÑA BAJA", "Direccion": "SAN JOSÉ, 304", "Telefono": "922-923345", "CorreoElectronico": "38000639@gobiernodecanarias.org" },
+                { "Codigo": "38001139", "Denominacion": "CEIP SANTO DOMINGO", "Municipio": "GARAFÍA", "Direccion": "C/ LOS HONDOS, S/N", "Telefono": "922-922000", "CorreoElectronico": "38001139@gobiernodecanarias.org" },
+                { "Codigo": "38005111", "Denominacion": "CEIP SAN VICENTE", "Municipio": "SANTA CRUZ DE LA PALMA", "Direccion": "C/ VELHOCO, 69", "Telefono": "922-592723", "CorreoElectronico": "38005111@gobiernodecanarias.org" },
+                { "Codigo": "38004967", "Denominacion": "CEIP TAGOJA", "Municipio": "SANTA CRUZ DE LA PALMA", "Direccion": "C/ MIRANDA, 57 (MIRCA)", "Telefono": "922-592123", "CorreoElectronico": "38004967@gobiernodecanarias.org" },
+                { "Codigo": "38003318", "Denominacion": "CEIP TODOQUE", "Municipio": "LOS LLANOS DE ARIDANE", "Direccion": "CTRA. GENERAL PTO. NAOS", "Telefono": "922-401742", "CorreoElectronico": "38003318@gobiernodecanarias.org" },
+                { "Codigo": "38004657", "Denominacion": "CEIP VERADA DE LAS LOMADAS", "Municipio": "SAN ANDRÉS Y SAUCES", "Direccion": "VERADA DE LAS LOMADAS", "Telefono": "922-474084", "CorreoElectronico": "38004657@gobiernodecanarias.org" },
+                { "Codigo": "38009621", "Denominacion": "CEPA GUAYAFANTA", "Municipio": "SANTA CRUZ DE LA PALMA", "Direccion": "C/ EL PILAR, 20", "Telefono": "922-174289", "CorreoElectronico": "38009621@gobiernodecanarias.org" },
+                { "Codigo": "38015515", "Denominacion": "EEI BREÑA ALTA", "Municipio": "BREÑA ALTA", "Direccion": "C/ ELÍAS PÉREZ HERNÁNDEZ, 78", "Telefono": "922-429013", "CorreoElectronico": "centroinfantil@balta.org" },
+                { "Codigo": "38015813", "Denominacion": "EEI DE SANTA CRUZ DE LA PALMA", "Municipio": "SANTA CRUZ DE LA PALMA", "Direccion": "C/ EL GALEÓN, S/N", "Telefono": "922-154232 y 922-426501", "CorreoElectronico": "mpsilva@eikoala.es" },
+                { "Codigo": "38017196", "Denominacion": "EEI DOÑA CARMELA", "Municipio": "EL PASO", "Direccion": "C/ JUAN PÉREZ CAPOTE, 20", "Telefono": "922-486848", "CorreoElectronico": "direccion@escuelacarmela.es" },
+                { "Codigo": "38017469", "Denominacion": "EEI DOÑA PEPITA", "Municipio": "BREÑA BAJA", "Direccion": "CALLE EL TONELERO, 17", "Telefono": "922-434803", "CorreoElectronico": "eipepita@bbaja.es" },
+                { "Codigo": "38017524", "Denominacion": "EEI LAS CALETAS", "Municipio": "FUENCALIENTE DE LA PALMA", "Direccion": "C/ SOCORRO PÉREZ TORRES Nº 3", "Telefono": "666-620333", "CorreoElectronico": "lascaletasescuelainfantil@gmail.com" },
+                { "Codigo": "38017494", "Denominacion": "EEI MERCEDES SÁNCHEZ CABRERA", "Municipio": "PUNTAGORDA", "Direccion": "CAMINO EL PINAR, 48", "Telefono": "922-493077", "CorreoElectronico": "escuelainfantil@puntagorda.es" },
+                { "Codigo": "38015849", "Denominacion": "EEI NINA LOLA ALBELO HERNÁNDEZ", "Municipio": "LOS LLANOS DE ARIDANE", "Direccion": "CAMINO LOS CHORICEROS, 10", "Telefono": "922-460111", "CorreoElectronico": "escuelainfantil@aridane.org" },
+                { "Codigo": "38017214", "Denominacion": "EEI PUNTALLANA", "Municipio": "PUNTALLANA", "Direccion": "C/ TRIBUTO, 23 - SANTA LUCÍA", "Telefono": "922-430000 y 922-430508", "CorreoElectronico": "escuelainfantil@puntallana.es" },
+                { "Codigo": "38015862", "Denominacion": "EEI SAN ANDRÉS Y SAUCES", "Municipio": "SAN ANDRÉS Y SAUCES", "Direccion": "C/ VICENTE SAN JUAN, 2", "Telefono": "922-452513", "CorreoElectronico": "escuelainfantil@sanandresysauces.es" },
+                { "Codigo": "38015837", "Denominacion": "EEI SANTO DOMINGO", "Municipio": "GARAFÍA", "Direccion": "C/ VÍA LÁCTEA, S/N", "Telefono": "922-400029", "CorreoElectronico": "vperez@garafia.org" },
+                { "Codigo": "38015850", "Denominacion": "EEI TIJARAFE", "Municipio": "TIJARAFE", "Direccion": "C/ SIETE DE SEPTIEMBRE, 2", "Telefono": "922-490331 y 638-543146", "CorreoElectronico": "escuelainfantil@tijarafe.org" },
+                { "Codigo": "38017408", "Denominacion": "EEI VILLA DE MAZO", "Municipio": "VILLA DE MAZO", "Direccion": "TRASERA DOCTOR MORERA BRAVO, S/N ", "Telefono": "922-440006 y 922-440003", "CorreoElectronico": "guarderia@villademazo.es" },
+                { "Codigo": "38601428", "Denominacion": "RE JARRA CANARIA", "Municipio": "LOS LLANOS DE ARIDANE", "Direccion": "C/ TABAIBA, 25", "Telefono": "922-463255 y 922-401855", "CorreoElectronico": "38601428@gobiernodecanarias.org" },
+                { "Codigo": "38004979", "Denominacion": "RE SAN JOSÉ", "Municipio": "SANTA CRUZ DE LA PALMA", "Direccion": "LAS LAJITAS, 1 (MIRCA)", "Telefono": "922-478686", "CorreoElectronico": "38004979@gobiernodecanarias.org" },
+                { "Codigo": "38010529", "Denominacion": "RE SAN MIGUEL DE LA PALMA", "Municipio": "SANTA CRUZ DE LA PALMA", "Direccion": "MIRCA, KM. 3,5 (MIRCA)", "Telefono": "922-478827", "CorreoElectronico": "38010529@gobiernodecanarias.org" }
+            ];
+
+
+            // --- ESTADO DE LA APLICACIÓN ---
+            const [selectedIsland, setSelectedIsland] = React.useState("All");
+            const [selectedZone, setSelectedZone] = React.useState("All");
+            const [openMunicipality, setOpenMunicipality] = React.useState(null);
+
+            // --- LÓGICA DE PROCESAMIENTO ---
+            const processedData = React.useMemo(() => {
+                const schoolTypesToKeep = ['CEIP', 'EEI', 'CEPA', 'CEO', 'CEP', 'RE'];
+                const filteredSchools = allSchoolsData.filter(school => {
+                    if (!school.Denominacion) return false;
+                    const schoolType = school.Denominacion.split(' ')[0];
+                    return schoolTypesToKeep.includes(schoolType);
+                });
+
+                let municipalitiesWithSchools = baseMunicipalitiesData.map(muni => ({
+                    ...muni,
+                    schools: filteredSchools.filter(school => school.Municipio && school.Municipio.toUpperCase().trim() === muni.municipality.toUpperCase().trim())
+                }));
+
+                if (selectedIsland !== "All") {
+                    municipalitiesWithSchools = municipalitiesWithSchools.filter(m => m.island === selectedIsland);
+                }
+
+                if (selectedZone !== "All") {
+                    municipalitiesWithSchools = municipalitiesWithSchools.filter(m => m.zone === selectedZone);
+                }
+
+                municipalitiesWithSchools.sort((a, b) => a.distance - b.distance);
+
+                return municipalitiesWithSchools.filter(m => m.schools.length > 0);
+
+            }, [selectedIsland, selectedZone]);
+            
+            const getMapUrl = (address, municipality, island) => {
+                const fullAddress = `${address}, ${municipality}, ${island}, España`;
+                return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress)}`;
+            };
+            
+            const toggleAccordion = (municipalityName) => {
+                setOpenMunicipality(openMunicipality === municipalityName ? null : municipalityName);
+            };
+
+            const islands = ["All", ...new Set(baseMunicipalitiesData.map(item => item.island))].sort();
+            const zones = ["All", "Norte", "Sur", "Este", "Oeste"];
+
+            return (
+                <div className="container mx-auto p-4 sm:p-6 lg:p-8">
+                    <div className="bg-white shadow-xl rounded-lg p-6 md:p-8">
+                        <div className="text-center mb-8">
+                            <h1 className="text-3xl md:text-4xl font-extrabold text-gray-800">Buscador de Colegios en Canarias</h1>
+                            <p className="text-md text-gray-600 mt-2">Creado por <span className="font-semibold">Daniel Tabuyo de las Peñas</span></p>
+                        </div>
+                        <div className="bg-blue-50 border-l-4 border-blue-500 text-blue-800 p-4 mb-8 rounded-r-lg">
+                            <h2 className="font-bold text-lg mb-2">Instrucciones</h2>
+                            <p className="text-sm">
+                                Filtra por <span className="font-semibold">isla</span> y/o <span className="font-semibold">zona</span>. Los municipios se ordenan por cercanía a su aeropuerto. Haz clic en un municipio para desplegar sus colegios.
+                            </p>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                            <div>
+                                <label htmlFor="islandFilter" className="block text-sm font-medium text-gray-700 mb-1">Filtrar por Isla</label>
+                                <select id="islandFilter" value={selectedIsland} onChange={(e) => { setSelectedIsland(e.target.value); setOpenMunicipality(null); }}
+                                    className="p-3 w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                                    {islands.map(island => <option key={island} value={island}>{island}</option>)}
+                                </select>
+                            </div>
+                             <div>
+                                <label htmlFor="zoneFilter" className="block text-sm font-medium text-gray-700 mb-1">Filtrar por Zona</label>
+                                <select id="zoneFilter" value={selectedZone} onChange={(e) => { setSelectedZone(e.target.value); setOpenMunicipality(null); }}
+                                    className="p-3 w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                                    {zones.map(zone => <option key={zone} value={zone}>{zone}</option>)}
+                                </select>
+                            </div>
+                        </div>
+                        <div id="results-accordion" className="space-y-2">
+                            {processedData.length === 0 ? (
+                                <p className="text-center text-gray-500 py-10">No se encontraron resultados con los filtros seleccionados.</p>
+                            ) : (
+                                processedData.map((muni) => (
+                                    <div key={muni.municipality} className="border border-gray-200 rounded-lg overflow-hidden">
+                                        <button onClick={() => toggleAccordion(muni.municipality)}
+                                            className="w-full flex justify-between items-center p-4 bg-gray-50 hover:bg-gray-100 focus:outline-none text-left">
+                                            <div>
+                                                <h3 className="font-semibold text-lg text-indigo-800">{muni.municipality} <span className="text-sm font-normal text-gray-500">({muni.schools.length} {muni.schools.length === 1 ? 'centro' : 'centros'})</span></h3>
+                                                <span className="text-xs text-gray-500">{muni.distance.toFixed(2)} km al aeropuerto ({muni.airport})</span>
+                                            </div>
+                                            <i className={`fas fa-chevron-down transition-transform duration-300 ${openMunicipality === muni.municipality ? 'rotate-180' : ''}`}></i>
+                                        </button>
+                                        <div className={`accordion-content ${openMunicipality === muni.municipality ? 'open' : ''}`}>
+                                            <div className="p-4 border-t border-gray-200 bg-white divide-y divide-gray-100">
+                                                {muni.schools.map(school => (
+                                                    <div key={school.Codigo} className="py-3">
+                                                        <div className="flex justify-between items-start">
+                                                            <h4 className="font-semibold text-gray-800 pr-4">{school.Denominacion}</h4>
+                                                            <a href={getMapUrl(school.Direccion, muni.municipality, muni.island)} target="_blank" rel="noopener noreferrer"
+                                                                className="ml-4 text-indigo-500 hover:text-indigo-700 flex-shrink-0" title="Ver en Google Maps">
+                                                                <i className="fas fa-map-location-dot fa-lg"></i>
+                                                            </a>
+                                                        </div>
+                                                        <div className="text-sm text-gray-600 mt-1 space-y-1">
+                                                             <p><span className="font-medium">Dirección:</span> {school.Direccion}</p>
+                                                             <p><span className="font-medium">Teléfono:</span> {school.Telefono || 'No disponible'}</p>
+                                                             <p className="word-break-all">
+                                                                <span className="font-medium">Email: </span>
+                                                                {school.CorreoElectronico ? <a href={`mailto:${school.CorreoElectronico}`} className="text-indigo-600 hover:underline">{school.CorreoElectronico}</a> : 'No disponible'}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </div>
+                     <footer className="text-center mt-8 py-4 text-gray-500 text-sm">
+                        <p>&copy; {new Date().getFullYear()} - Daniel Tabuyo de las Peñas</p>
+                    </footer>
+                </div>
+            );
+        };
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>
+
